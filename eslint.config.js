@@ -146,7 +146,7 @@ export default tseslint.config(
     ignores: [
       "./eslint.config.js",
       "next.config.mjs",
-      "dist/*",
+      "docs/*",
     ],
   },
   eslintConfigPrettier,
