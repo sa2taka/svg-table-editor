@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     restoreMocks: true,
     mockReset: true,
+    setupFiles: ["./src/test-setup.ts"],
   },
   esbuild: {
     target: "es2022",

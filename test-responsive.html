@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Responsive SVG Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .svg-container { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        svg { border: 1px solid red; }
+    </style>
+</head>
+<body>
+    <h1>SVG Table Editor - Responsive Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Open the main app at <a href="http://localhost:5174" target="_blank">http://localhost:5174</a></li>
+            <li>Add some text to cells - try short text and very long text</li>
+            <li>Look for the "Responsive" checkbox in the Export section of the toolbar</li>
+            <li>Try exporting with responsive OFF (fixed size)</li>
+            <li>Try exporting with responsive ON (should adapt to content)</li>
+            <li>Compare the SVG files or preview</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h2>Expected Behavior</h2>
+        <ul>
+            <li><strong>Fixed Mode (responsive OFF):</strong> All cells should be 120px wide and 28px tall</li>
+            <li><strong>Responsive Mode (responsive ON):</strong> Cell widths should vary based on text content</li>
+            <li>Long text should make cells wider</li>
+            <li>Short text should make cells narrower (but not below minimum)</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h2>Manual Test Cases</h2>
+        <h3>Test Case 1: Short vs Long Text</h3>
+        <ul>
+            <li>Cell A1: "Hi" (short)</li>
+            <li>Cell B1: "This is a very long text that should make the cell much wider" (long)</li>
+        </ul>
+        
+        <h3>Expected Result:</h3>
+        <ul>
+            <li>Fixed mode: Both cells same width (120px)</li>
+            <li>Responsive mode: B column much wider than A column</li>
+        </ul>
+    </div>
+
+    <script>
+        // Check if responsive feature is actually working
+        console.log("To test responsive SVG:");
+        console.log("1. Go to http://localhost:5174");
+        console.log("2. Check if there's a 'Responsive' checkbox in the Export section");
+        console.log("3. Toggle it and export SVGs to compare");
+        console.log("4. Inspect the SVG width attributes in the downloaded files");
+    </script>
+</body>
+</html>
