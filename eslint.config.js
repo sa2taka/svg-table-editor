@@ -144,11 +144,9 @@ export default tseslint.config(
   },
   {
     ignores: [
-      "./.next/*",
       "./eslint.config.js",
       "next.config.mjs",
-      "src/generated/*",
-      "__tests__/__generated__/*",
+      "dist/*",
     ],
   },
   eslintConfigPrettier,
