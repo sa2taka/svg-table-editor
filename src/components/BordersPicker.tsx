@@ -15,13 +15,7 @@ export interface BordersPickerProps {
 type BorderMode = "cell" | "grid";
 type BorderTarget = "outer" | "innerVertical" | "innerHorizontal" | "individual";
 
-export const BordersPicker = ({ 
-  cellBorder, 
-  onCellBorderChange, 
-  gridBorder, 
-  onGridBorderChange, 
-  label 
-}: BordersPickerProps) => {
+export const BordersPicker = ({ cellBorder, onCellBorderChange, gridBorder, onGridBorderChange, label }: BordersPickerProps) => {
   const [showPicker, setShowPicker] = useState(false);
   const [mode, setMode] = useState<BorderMode>("cell");
   const [target, setTarget] = useState<BorderTarget>("outer");
@@ -50,7 +44,7 @@ export const BordersPicker = ({
       case "none":
         onCellBorderChange({
           top: "transparent",
-          right: "transparent", 
+          right: "transparent",
           bottom: "transparent",
           left: "transparent",
         });
@@ -59,7 +53,7 @@ export const BordersPicker = ({
         onCellBorderChange({
           top: "#000000",
           right: "#000000",
-          bottom: "#000000", 
+          bottom: "#000000",
           left: "#000000",
         });
         break;
@@ -294,9 +288,7 @@ export const BordersPicker = ({
           {mode === "cell" ? (
             // 個別セル境界線設定
             <div>
-              <div style={{ marginBottom: "12px", fontSize: "12px", color: "#666" }}>
-                Edit individual cell borders:
-              </div>
+              <div style={{ marginBottom: "12px", fontSize: "12px", color: "#666" }}>Edit individual cell borders:</div>
 
               {/* 境界線側選択 */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px", marginBottom: "12px" }}>
@@ -328,9 +320,7 @@ export const BordersPicker = ({
           ) : (
             // グリッド境界線設定
             <div>
-              <div style={{ marginBottom: "12px", fontSize: "12px", color: "#666" }}>
-                Edit selection range borders:
-              </div>
+              <div style={{ marginBottom: "12px", fontSize: "12px", color: "#666" }}>Edit selection range borders:</div>
 
               {/* グリッド境界線タイプ選択 */}
               <div style={{ marginBottom: "12px" }}>
@@ -384,11 +374,11 @@ export const BordersPicker = ({
                 value={getCurrentColor()}
                 onChange={handleColorChange}
                 label={
-                  target === "outer" 
+                  target === "outer"
                     ? `Outer ${selectedSide} Border`
                     : target === "innerVertical"
-                    ? "Vertical Grid Lines"
-                    : "Horizontal Grid Lines"
+                      ? "Vertical Grid Lines"
+                      : "Horizontal Grid Lines"
                 }
                 allowTransparent={true}
               />

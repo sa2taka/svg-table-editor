@@ -1,17 +1,18 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createTable, setCellText } from "../src/models/TableDataModel.js";
-import { 
-  serializeStateToURL, 
-  deserializeStateFromURL, 
-  updateURLWithState, 
-  getStateFromURL, 
+import {
+  AppState,
   clearStateFromURL,
-  AppState 
+  deserializeStateFromURL,
+  getStateFromURL,
+  serializeStateToURL,
+  updateURLWithState,
 } from "../src/utils/urlStateManager.js";
 
 describe("URL State Manager", () => {
   let mockLocation: Location;
   let originalLocation: Location;
+  let mockReplaceState: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     // Mock window.location
@@ -20,36 +21,37 @@ describe("URL State Manager", () => {
       href: "http://localhost:3000/",
       search: "",
     } as Location;
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(window, "location", {
       value: mockLocation,
       writable: true,
     });
 
     // Mock URL constructor
-    (globalThis as any).URL = class MockURL {
+    (globalThis as { URL: new (url: string) => { searchParams: URLSearchParams; toString(): string } }).URL = class MockURL {
       public searchParams: URLSearchParams;
-      
+
       constructor(url: string) {
-        this.searchParams = new URLSearchParams(url.split('?')[1] || '');
+        this.searchParams = new URLSearchParams(url.split("?")[1] || "");
       }
-      
+
       toString() {
         const params = this.searchParams.toString();
-        return `http://localhost:3000/${params ? `?${params}` : ''}`;
+        return `http://localhost:3000/${params ? `?${params}` : ""}`;
       }
     };
 
     // Mock window.history
-    Object.defineProperty(window, 'history', {
+    mockReplaceState = vi.fn();
+    Object.defineProperty(window, "history", {
       value: {
-        replaceState: vi.fn(),
+        replaceState: mockReplaceState,
       },
       writable: true,
     });
   });
 
   afterEach(() => {
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(window, "location", {
       value: originalLocation,
       writable: true,
     });
@@ -109,10 +111,10 @@ describe("URL State Manager", () => {
       const state: AppState = { table, selection: null };
 
       const serialized = serializeStateToURL(state);
-      
+
       // Should not contain URL-unsafe characters
       expect(serialized).not.toMatch(/[+/=]/);
-      
+
       // Should deserialize correctly
       const deserialized = deserializeStateFromURL(serialized);
       expect(deserialized).not.toBeNull();
@@ -128,8 +130,8 @@ describe("URL State Manager", () => {
     it("should handle invalid state structure", () => {
       // Create a valid base64 string with invalid state
       const invalidState = btoa(JSON.stringify({ invalid: "structure" }));
-      const urlSafeState = invalidState.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-      
+      const urlSafeState = invalidState.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+
       expect(deserializeStateFromURL(urlSafeState)).toBeNull();
     });
   });
@@ -141,7 +143,7 @@ describe("URL State Manager", () => {
 
       updateURLWithState(state);
 
-      expect(window.history.replaceState).toHaveBeenCalled();
+      expect(mockReplaceState).toHaveBeenCalled();
     });
 
     it("should get state from URL", () => {
@@ -169,15 +171,15 @@ describe("URL State Manager", () => {
 
     it("should clear state from URL", () => {
       clearStateFromURL();
-      expect(window.history.replaceState).toHaveBeenCalled();
+      expect(mockReplaceState).toHaveBeenCalled();
     });
   });
 
   describe("error handling", () => {
     it("should handle serialization errors gracefully", () => {
       // Create a circular reference to cause JSON.stringify to fail
-      const circularState = { table: null } as any;
-      circularState.table = circularState;
+      const circularState = { table: null, selection: null } as unknown as AppState;
+      circularState.table = circularState as unknown as AppState['table'];
 
       const result = serializeStateToURL(circularState);
       expect(result).toBe("");
@@ -185,9 +187,12 @@ describe("URL State Manager", () => {
 
     it("should handle URL operations errors gracefully", () => {
       // Mock URL constructor to throw
-      (globalThis as any).URL = class {
+      (globalThis as unknown as { URL: new () => { toString(): string } }).URL = class {
         constructor() {
           throw new Error("URL constructor failed");
+        }
+        toString() {
+          return "";
         }
       };
 
@@ -210,27 +215,27 @@ describe("URL State Manager", () => {
       let table = createTable(3, 3);
       for (let row = 0; row < 3; row++) {
         for (let col = 0; col < 3; col++) {
-          table = setCellText(table, row, col, `Cell (${row+1},${col+1}) with content`);
+          table = setCellText(table, row, col, `Cell (${row + 1},${col + 1}) with content`);
         }
       }
-      
+
       const state: AppState = { table, selection: { startRow: 0, startColumn: 0, endRow: 2, endColumn: 2 } };
-      
+
       // Simulate old method (JSON + Base64)
       const oldMethod = () => {
         const jsonString = JSON.stringify(state);
         const base64String = btoa(jsonString);
-        return base64String.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        return base64String.replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
       };
-      
+
       const oldUrl = oldMethod();
       const newUrl = serializeStateToURL(state);
-      
+
       console.log(`\n=== Compression Test ===`);
       console.log(`Old method: ${oldUrl.length} characters`);
       console.log(`New method: ${newUrl.length} characters`);
-      console.log(`Compression: ${((oldUrl.length - newUrl.length) / oldUrl.length * 100).toFixed(1)}% smaller`);
-      
+      console.log(`Compression: ${(((oldUrl.length - newUrl.length) / oldUrl.length) * 100).toFixed(1)}% smaller`);
+
       // New method should be significantly shorter
       expect(newUrl.length).toBeLessThan(oldUrl.length);
       expect(newUrl.length / oldUrl.length).toBeLessThan(0.5); // At least 50% smaller

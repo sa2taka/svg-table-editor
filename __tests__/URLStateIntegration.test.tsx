@@ -1,12 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../src/App.js";
 
 describe("URL State Integration", () => {
   beforeEach(() => {
     // Mock window.location
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(window, "location", {
       value: {
         href: "http://localhost:3000/",
         search: "",
@@ -15,21 +15,21 @@ describe("URL State Integration", () => {
     });
 
     // Mock URL constructor
-    (globalThis as any).URL = class MockURL {
+    (globalThis as { URL: new (url: string) => { searchParams: URLSearchParams; toString(): string } }).URL = class MockURL {
       public searchParams: URLSearchParams;
-      
+
       constructor(url: string) {
-        this.searchParams = new URLSearchParams(url.split('?')[1] || '');
+        this.searchParams = new URLSearchParams(url.split("?")[1] || "");
       }
-      
+
       toString() {
         const params = this.searchParams.toString();
-        return `http://localhost:3000/${params ? `?${params}` : ''}`;
+        return `http://localhost:3000/${params ? `?${params}` : ""}`;
       }
     };
 
     // Mock window.history
-    Object.defineProperty(window, 'history', {
+    Object.defineProperty(window, "history", {
       value: {
         replaceState: vi.fn(),
       },
@@ -37,8 +37,8 @@ describe("URL State Integration", () => {
     });
 
     // Mock window.alert and confirm
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
-    vi.spyOn(window, 'confirm').mockImplementation(() => true);
+    vi.spyOn(window, "alert").mockImplementation(() => {});
+    vi.spyOn(window, "confirm").mockImplementation(() => true);
   });
 
   afterEach(() => {
@@ -74,7 +74,7 @@ describe("URL State Integration", () => {
 
   it("should call confirm when clicking New button", async () => {
     const user = userEvent.setup();
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(<App />);
 
@@ -86,7 +86,7 @@ describe("URL State Integration", () => {
 
   it("should call confirm when clicking Clear URL button", async () => {
     const user = userEvent.setup();
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true);
 
     render(<App />);
 
@@ -98,8 +98,8 @@ describe("URL State Integration", () => {
 
   it("should not take action when user cancels confirmation", async () => {
     const user = userEvent.setup();
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
-    const historyReplaceSpy = vi.spyOn(window.history, 'replaceState');
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const historyReplaceSpy = vi.spyOn(window.history, "replaceState");
 
     render(<App />);
 
@@ -113,7 +113,7 @@ describe("URL State Integration", () => {
 
   it("should update URL state periodically", async () => {
     vi.useFakeTimers();
-    const historyReplaceSpy = vi.spyOn(window.history, 'replaceState');
+    const historyReplaceSpy = vi.spyOn(window.history, "replaceState");
 
     render(<App />);
 
@@ -127,9 +127,10 @@ describe("URL State Integration", () => {
 
   it("should load initial state from URL if available", () => {
     // Mock a URL with state
-    const mockState = "eyJ0YWJsZSI6eyJyb3dzIjoyLCJjb2x1bW5zIjoyLCJjZWxscyI6W1t7InJvdyI6MCwiY29sdW1uIjowLCJjb250ZW50IjoiVGVzdCIsInN0eWxlIjp7fX0se30iXV0sInNlbGVjdGlvbiI6bnVsbH0"; // Base64 encoded test state
-    
-    Object.defineProperty(window, 'location', {
+    const mockState =
+      "eyJ0YWJsZSI6eyJyb3dzIjoyLCJjb2x1bW5zIjoyLCJjZWxscyI6W1t7InJvdyI6MCwiY29sdW1uIjowLCJjb250ZW50IjoiVGVzdCIsInN0eWxlIjp7fX0se30iXV0sInNlbGVjdGlvbiI6bnVsbH0"; // Base64 encoded test state
+
+    Object.defineProperty(window, "location", {
       value: {
         href: `http://localhost:3000/?state=${mockState}`,
         search: `?state=${mockState}`,
@@ -146,7 +147,7 @@ describe("URL State Integration", () => {
 
   it("should handle invalid URL state gracefully", () => {
     // Mock a URL with invalid state
-    Object.defineProperty(window, 'location', {
+    Object.defineProperty(window, "location", {
       value: {
         href: "http://localhost:3000/?state=invalid-state",
         search: "?state=invalid-state",

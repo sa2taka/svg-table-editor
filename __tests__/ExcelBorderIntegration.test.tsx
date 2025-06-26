@@ -18,12 +18,10 @@ describe("Borders Integration", () => {
     render(<App />);
 
     // Find the borders picker button by looking for the button containing "Borders" text
-    const bordersButtons = screen.getAllByRole('button');
-    const bordersButton = bordersButtons.find(button => 
-      button.textContent?.includes('Borders')
-    );
+    const bordersButtons = screen.getAllByRole("button");
+    const bordersButton = bordersButtons.find((button) => button.textContent?.includes("Borders"));
     expect(bordersButton).toBeDefined();
-    
+
     if (bordersButton) {
       await user.click(bordersButton);
     }

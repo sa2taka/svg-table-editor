@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CellSelection, createCellSelection, isCellSelected } from "../models/CellSelection.js";
 import { CellData, TableDataModel } from "../models/TableDataModel.js";
 
@@ -19,16 +19,16 @@ interface EditingCell {
   column: number;
 }
 
-export const TableEditor = ({ 
-  table, 
-  selection, 
-  onCellClick, 
-  onCellChange, 
+export const TableEditor = ({
+  table,
+  selection,
+  onCellClick,
+  onCellChange,
   onSelectionChange,
   onInsertRowAt,
   onRemoveRowAt,
   onInsertColumnAt,
-  onRemoveColumnAt
+  onRemoveColumnAt,
 }: TableEditorProps) => {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -39,7 +39,7 @@ export const TableEditor = ({
     visible: boolean;
     x: number;
     y: number;
-    type: 'row' | 'column';
+    type: "row" | "column";
     index: number;
   } | null>(null);
   const contextMenuRef = useRef<HTMLDivElement>(null);
@@ -52,15 +52,15 @@ export const TableEditor = ({
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   const handleCellClick = (row: number, column: number) => {
     setContextMenu(null); // コンテキストメニューを閉じる
-    
+
     if (onCellClick) {
       onCellClick(row, column);
     }
@@ -77,8 +77,8 @@ export const TableEditor = ({
       visible: true,
       x: e.clientX,
       y: e.clientY,
-      type: 'row',
-      index: rowIndex
+      type: "row",
+      index: rowIndex,
     });
   };
 
@@ -88,8 +88,8 @@ export const TableEditor = ({
       visible: true,
       x: e.clientX,
       y: e.clientY,
-      type: 'column',
-      index: columnIndex
+      type: "column",
+      index: columnIndex,
     });
   };
 
@@ -97,31 +97,31 @@ export const TableEditor = ({
     if (!contextMenu) return;
 
     const { type, index } = contextMenu;
-    
+
     switch (action) {
-      case 'insertBefore':
-        if (type === 'row' && onInsertRowAt) {
+      case "insertBefore":
+        if (type === "row" && onInsertRowAt) {
           onInsertRowAt(index);
-        } else if (type === 'column' && onInsertColumnAt) {
+        } else if (type === "column" && onInsertColumnAt) {
           onInsertColumnAt(index);
         }
         break;
-      case 'insertAfter':
-        if (type === 'row' && onInsertRowAt) {
+      case "insertAfter":
+        if (type === "row" && onInsertRowAt) {
           onInsertRowAt(index + 1);
-        } else if (type === 'column' && onInsertColumnAt) {
+        } else if (type === "column" && onInsertColumnAt) {
           onInsertColumnAt(index + 1);
         }
         break;
-      case 'remove':
-        if (type === 'row' && onRemoveRowAt) {
+      case "remove":
+        if (type === "row" && onRemoveRowAt) {
           onRemoveRowAt(index);
-        } else if (type === 'column' && onRemoveColumnAt) {
+        } else if (type === "column" && onRemoveColumnAt) {
           onRemoveColumnAt(index);
         }
         break;
     }
-    
+
     setContextMenu(null);
   };
 
@@ -394,13 +394,7 @@ export const TableEditor = ({
   };
 
   return (
-    <div 
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      style={{ outline: "none", position: "relative" }}
-      role="grid"
-      aria-label="Table editor"
-    >
+    <div tabIndex={0} onKeyDown={handleKeyDown} style={{ outline: "none", position: "relative" }} role="grid" aria-label="Table editor">
       <table style={{ borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -408,8 +402,8 @@ export const TableEditor = ({
             <th style={headerStyle}></th>
             {/* 列番号ヘッダー */}
             {Array.from({ length: table.columns }, (_, i) => (
-              <th 
-                key={`col-${i}`} 
+              <th
+                key={`col-${i}`}
                 style={headerStyle}
                 onContextMenu={(e) => {
                   handleColumnHeaderRightClick(e, i);
@@ -425,7 +419,7 @@ export const TableEditor = ({
           {table.cells.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {/* 行番号ヘッダー */}
-              <th 
+              <th
                 style={headerStyle}
                 onContextMenu={(e) => {
                   handleRowHeaderRightClick(e, rowIndex);
@@ -457,53 +451,56 @@ export const TableEditor = ({
             minWidth: "150px",
           }}
         >
-          <div 
+          <div
             role="button"
             tabIndex={0}
             style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #eee" }}
             onClick={() => {
-              handleContextMenuAction('insertBefore');
+              handleContextMenuAction("insertBefore");
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                handleContextMenuAction('insertBefore');
+              if (e.key === "Enter" || e.key === " ") {
+                handleContextMenuAction("insertBefore");
               }
             }}
           >
             Insert {contextMenu.type} before
           </div>
-          <div 
+          <div
             role="button"
             tabIndex={0}
             style={{ padding: "8px 12px", cursor: "pointer", borderBottom: "1px solid #eee" }}
             onClick={() => {
-              handleContextMenuAction('insertAfter');
+              handleContextMenuAction("insertAfter");
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                handleContextMenuAction('insertAfter');
+              if (e.key === "Enter" || e.key === " ") {
+                handleContextMenuAction("insertAfter");
               }
             }}
           >
             Insert {contextMenu.type} after
           </div>
-          <div 
+          <div
             role="button"
             tabIndex={0}
-            style={{ 
-              padding: "8px 12px", 
-              cursor: "pointer", 
-              color: (contextMenu.type === 'row' && table.rows <= 1) || (contextMenu.type === 'column' && table.columns <= 1) ? "#ccc" : "#dc3545"
+            style={{
+              padding: "8px 12px",
+              cursor: "pointer",
+              color:
+                (contextMenu.type === "row" && table.rows <= 1) || (contextMenu.type === "column" && table.columns <= 1)
+                  ? "#ccc"
+                  : "#dc3545",
             }}
             onClick={() => {
-              if ((contextMenu.type === 'row' && table.rows > 1) || (contextMenu.type === 'column' && table.columns > 1)) {
-                handleContextMenuAction('remove');
+              if ((contextMenu.type === "row" && table.rows > 1) || (contextMenu.type === "column" && table.columns > 1)) {
+                handleContextMenuAction("remove");
               }
             }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                if ((contextMenu.type === 'row' && table.rows > 1) || (contextMenu.type === 'column' && table.columns > 1)) {
-                  handleContextMenuAction('remove');
+              if (e.key === "Enter" || e.key === " ") {
+                if ((contextMenu.type === "row" && table.rows > 1) || (contextMenu.type === "column" && table.columns > 1)) {
+                  handleContextMenuAction("remove");
                 }
               }
             }}

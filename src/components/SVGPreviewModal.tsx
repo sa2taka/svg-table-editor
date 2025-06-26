@@ -111,23 +111,15 @@ export const SVGPreviewModal = ({ isOpen, svgContent, onClose, onDownload }: SVG
         <div style={headerStyle}>
           <h3 style={{ margin: 0, fontSize: "18px" }}>SVG Preview</h3>
           <div>
-            <button
-              style={primaryButtonStyle}
-              onClick={onDownload}
-              title="Download SVG file"
-            >
+            <button style={primaryButtonStyle} onClick={onDownload} title="Download SVG file">
               📥 Download
             </button>
-            <button
-              style={secondaryButtonStyle}
-              onClick={onClose}
-              title="Close preview"
-            >
+            <button style={secondaryButtonStyle} onClick={onClose} title="Close preview">
               ✕ Close
             </button>
           </div>
         </div>
-        
+
         <div style={previewAreaStyle}>
           <div
             dangerouslySetInnerHTML={{ __html: svgContent }}
@@ -138,13 +130,15 @@ export const SVGPreviewModal = ({ isOpen, svgContent, onClose, onDownload }: SVG
             }}
           />
         </div>
-        
-        <div style={{ 
-          marginTop: "12px", 
-          fontSize: "12px", 
-          color: "#666",
-          textAlign: "center" as const
-        }}>
+
+        <div
+          style={{
+            marginTop: "12px",
+            fontSize: "12px",
+            color: "#666",
+            textAlign: "center" as const,
+          }}
+        >
           Press Escape or click outside to close
         </div>
       </div>

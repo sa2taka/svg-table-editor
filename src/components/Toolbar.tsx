@@ -289,7 +289,9 @@ export const Toolbar = ({
 
       {/* Table Size Group */}
       <div style={groupStyle}>
-        <span style={groupTitleStyle}>Table ({tableSize?.rows ?? 0}×{tableSize?.columns ?? 0})</span>
+        <span style={groupTitleStyle}>
+          Table ({tableSize?.rows ?? 0}×{tableSize?.columns ?? 0})
+        </span>
         <div style={{ display: "flex", gap: "2px" }}>
           <button
             style={{
@@ -361,7 +363,7 @@ export const Toolbar = ({
       {/* Export Group */}
       <div style={groupStyle}>
         <span style={groupTitleStyle}>Export</span>
-        
+
         <button
           style={{
             ...buttonStyle,
@@ -381,7 +383,7 @@ export const Toolbar = ({
         >
           👁️ Preview
         </button>
-        
+
         <button
           style={{
             ...buttonStyle,
@@ -424,7 +426,7 @@ export const Toolbar = ({
         >
           🆕 New
         </button>
-        
+
         <button
           style={{
             ...buttonStyle,

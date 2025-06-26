@@ -1,6 +1,6 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BordersPicker } from "../src/components/BordersPicker.js";
 
 describe("BordersPicker", () => {
@@ -9,7 +9,7 @@ describe("BordersPicker", () => {
 
   const defaultCellBorder = {
     top: "#000000",
-    right: "#000000", 
+    right: "#000000",
     bottom: "#000000",
     left: "#000000",
   };
@@ -18,7 +18,7 @@ describe("BordersPicker", () => {
     outer: {
       top: "#000000",
       right: "#000000",
-      bottom: "#000000", 
+      bottom: "#000000",
       left: "#000000",
     },
     innerVertical: "#000000",
@@ -46,7 +46,7 @@ describe("BordersPicker", () => {
 
   it("should open dropdown when button is clicked", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -66,7 +66,7 @@ describe("BordersPicker", () => {
 
   it("should display preset buttons", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -87,7 +87,7 @@ describe("BordersPicker", () => {
 
   it("should apply 'no borders' preset", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -113,7 +113,7 @@ describe("BordersPicker", () => {
 
   it("should apply 'all borders' preset", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -139,7 +139,7 @@ describe("BordersPicker", () => {
 
   it("should switch between individual cell and selection range modes", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -167,7 +167,7 @@ describe("BordersPicker", () => {
 
   it("should handle individual cell border side selection", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -190,7 +190,7 @@ describe("BordersPicker", () => {
 
   it("should handle grid border type selection", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -216,7 +216,7 @@ describe("BordersPicker", () => {
 
   it("should close picker when close button is clicked", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -265,7 +265,7 @@ describe("BordersPicker", () => {
 
   it("should apply outer border preset", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}
@@ -294,7 +294,7 @@ describe("BordersPicker", () => {
 
   it("should apply grid lines preset", async () => {
     const user = userEvent.setup();
-    
+
     render(
       <BordersPicker
         cellBorder={defaultCellBorder}

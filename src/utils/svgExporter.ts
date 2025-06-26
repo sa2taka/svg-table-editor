@@ -9,17 +9,17 @@ export interface SVGExportOptions {
   fontFamily?: string;
   padding?: number;
   backgroundColor?: string;
-  
+
   // New responsive options
-  responsive?: boolean;              // Enable responsive mode
-  minCellWidth?: number;            // Minimum cell width
-  maxCellWidth?: number;            // Maximum cell width
-  minCellHeight?: number;           // Minimum cell height
-  maxCellHeight?: number;           // Maximum cell height
-  textMargin?: number;              // Additional margin around text
-  autoScale?: boolean;              // Auto-scale SVG to fit container
-  targetWidth?: number;             // Target SVG width for auto-scaling
-  maintainAspectRatio?: boolean;    // Maintain aspect ratio when scaling
+  responsive?: boolean; // Enable responsive mode
+  minCellWidth?: number; // Minimum cell width
+  maxCellWidth?: number; // Maximum cell width
+  minCellHeight?: number; // Minimum cell height
+  maxCellHeight?: number; // Maximum cell height
+  textMargin?: number; // Additional margin around text
+  autoScale?: boolean; // Auto-scale SVG to fit container
+  targetWidth?: number; // Target SVG width for auto-scaling
+  maintainAspectRatio?: boolean; // Maintain aspect ratio when scaling
 }
 
 const DEFAULT_OPTIONS: Required<SVGExportOptions> = {
@@ -30,7 +30,7 @@ const DEFAULT_OPTIONS: Required<SVGExportOptions> = {
   fontFamily: "Arial, sans-serif",
   padding: 2,
   backgroundColor: "#ffffff",
-  
+
   // New responsive options
   responsive: true,
   minCellWidth: 60,
@@ -66,7 +66,7 @@ function calculateCellDimensions(cell: CellData, opts: Required<SVGExportOptions
   const fontStyle: FontStyle = {
     fontSize: opts.fontSize,
     fontFamily: opts.fontFamily,
-    fontWeight: cell.style.fontWeight === 'bold' ? 'bold' : 'normal'
+    fontWeight: cell.style.fontWeight === "bold" ? "bold" : "normal",
   };
 
   const { width, height } = calculateOptimalCellSize(
@@ -79,7 +79,7 @@ function calculateCellDimensions(cell: CellData, opts: Required<SVGExportOptions
 
   return {
     width: Math.min(width, opts.maxCellWidth),
-    height: Math.min(height, opts.maxCellHeight)
+    height: Math.min(height, opts.maxCellHeight),
   };
 }
 
@@ -93,7 +93,7 @@ function calculateTableLayout(table: TableDataModel, opts: Required<SVGExportOpt
       columnWidths: Array(table.columns).fill(opts.cellWidth) as number[],
       rowHeights: Array(table.rows).fill(opts.cellHeight) as number[],
       totalWidth: table.columns * opts.cellWidth,
-      totalHeight: table.rows * opts.cellHeight
+      totalHeight: table.rows * opts.cellHeight,
     };
   }
 
@@ -144,7 +144,7 @@ function calculateTableLayout(table: TableDataModel, opts: Required<SVGExportOpt
     columnWidths,
     rowHeights,
     totalWidth,
-    totalHeight
+    totalHeight,
   };
 }
 
@@ -163,7 +163,7 @@ export function exportTableToSVG(table: TableDataModel, options: SVGExportOption
   if (opts.autoScale && opts.targetWidth && opts.targetWidth < layout.totalWidth) {
     const scale = opts.targetWidth / layout.totalWidth;
     svgWidth = opts.targetWidth;
-    
+
     if (opts.maintainAspectRatio) {
       svgHeight = layout.totalHeight * scale;
     }
@@ -212,26 +212,26 @@ function renderCell(cell: CellData, opts: Required<SVGExportOptions>, layout: Ta
   // Calculate cell position and dimensions from layout
   let x = 0;
   let y = 0;
-  
+
   // Sum column widths before this cell
   for (let col = 0; col < cell.column; col++) {
     x += layout.columnWidths[col];
   }
-  
+
   // Sum row heights before this cell
   for (let row = 0; row < cell.row; row++) {
     y += layout.rowHeights[row];
   }
-  
+
   // Calculate cell dimensions (including merged cells)
   let width = 0;
   let height = 0;
-  
+
   // Sum widths for merged columns
   for (let col = cell.column; col < cell.column + cell.colSpan; col++) {
     width += layout.columnWidths[col];
   }
-  
+
   // Sum heights for merged rows
   for (let row = cell.row; row < cell.row + cell.rowSpan; row++) {
     height += layout.rowHeights[row];

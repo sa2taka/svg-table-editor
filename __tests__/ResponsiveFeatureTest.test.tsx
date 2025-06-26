@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createTable, setCellText } from "../src/models/TableDataModel.js";
 import { exportTableToSVG } from "../src/utils/svgExporter.js";
 
@@ -15,21 +15,21 @@ describe("Responsive Feature Integration Test", () => {
     const fixedSVG = exportTableToSVG(table, {
       cellWidth: 120,
       cellHeight: 28,
-      responsive: false
+      responsive: false,
     });
 
-    // Test responsive mode  
+    // Test responsive mode
     const responsiveSVG = exportTableToSVG(table, {
       responsive: true,
       minCellWidth: 60,
       maxCellWidth: 300,
       minCellHeight: 20,
-      maxCellHeight: 100
+      maxCellHeight: 100,
     });
 
     console.log("=== Fixed Mode SVG ===");
     console.log("First 300 chars:", fixedSVG.substring(0, 300));
-    
+
     console.log("\n=== Responsive Mode SVG ===");
     console.log("First 300 chars:", responsiveSVG.substring(0, 300));
 
@@ -45,7 +45,7 @@ describe("Responsive Feature Integration Test", () => {
 
     // Fixed mode should have predictable dimensions
     expect(fixedWidth).toBe("240"); // 2 columns * 120px
-    expect(fixedHeight).toBe("56");  // 2 rows * 28px
+    expect(fixedHeight).toBe("56"); // 2 rows * 28px
 
     // Responsive mode should be different (likely wider due to long text)
     expect(responsiveWidth).not.toBe("240");
@@ -57,7 +57,7 @@ describe("Responsive Feature Integration Test", () => {
     const testOptions = {
       responsive: true,
       minCellWidth: 60,
-      maxCellWidth: 300
+      maxCellWidth: 300,
     };
 
     // Create a simple table
@@ -65,12 +65,12 @@ describe("Responsive Feature Integration Test", () => {
     table = setCellText(table, 0, 0, "Test cell with some content");
 
     const svg = exportTableToSVG(table, testOptions);
-    
+
     // Should contain dynamic sizing
-    expect(svg).toContain('<svg');
-    expect(svg).toContain('width=');
-    expect(svg).toContain('height=');
-    
+    expect(svg).toContain("<svg");
+    expect(svg).toContain("width=");
+    expect(svg).toContain("height=");
+
     // Width should not be the default 120px for a single cell
     const width = /width="(\d+)"/.exec(svg)?.[1];
     expect(width).toBeDefined();

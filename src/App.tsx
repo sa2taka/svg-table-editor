@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { SVGPreviewModal } from "./components/SVGPreviewModal.js";
 import { TableEditor } from "./components/TableEditor.js";
 import { Toolbar } from "./components/Toolbar.js";
-import { SVGPreviewModal } from "./components/SVGPreviewModal.js";
 import { CellSelection, getSelectedCells, getSelectionBounds } from "./models/CellSelection.js";
 import {
   addColumn,
@@ -22,12 +22,7 @@ import {
   TableDataModel,
 } from "./models/TableDataModel.js";
 import { downloadSVG, exportTableToSVG } from "./utils/svgExporter.js";
-import { 
-  updateURLWithState, 
-  getStateFromURL, 
-  clearStateFromURL,
-  AppState 
-} from "./utils/urlStateManager.js";
+import { AppState, clearStateFromURL, getStateFromURL, updateURLWithState } from "./utils/urlStateManager.js";
 
 const App = () => {
   const createInitialTable = (): TableDataModel => {
@@ -60,7 +55,6 @@ const App = () => {
     isOpen: false,
     svgContent: "",
   });
-
 
   // Debounced URL update to avoid excessive URL changes
   const updateURL = useCallback(() => {
