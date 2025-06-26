@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { TableEditor } from "../src/components/TableEditor.js";
-import { createTable } from "../src/models/TableDataModel.js";
+import { TableEditor } from "../../src/components/TableEditor.js";
+import { createTable } from "../../src/models/TableDataModel.js";
 
 describe("TableEditor", () => {
   describe("rendering", () => {

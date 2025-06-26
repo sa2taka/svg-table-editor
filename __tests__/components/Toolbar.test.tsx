@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Toolbar } from "../src/components/Toolbar.js";
-import { CellStyle } from "../src/models/TableDataModel.js";
+import { Toolbar } from "../../src/components/Toolbar.js";
+import { CellStyle } from "../../src/models/TableDataModel.js";
 
 describe("Toolbar", () => {
   const mockStyle: CellStyle = {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createTable, setCellText } from "../src/models/TableDataModel.js";
+import { createTable, setCellText } from "../../src/models/TableDataModel.js";
 import {
   AppState,
   clearStateFromURL,
@@ -7,7 +7,7 @@ import {
   getStateFromURL,
   serializeStateToURL,
   updateURLWithState,
-} from "../src/utils/urlStateManager.js";
+} from "../../src/utils/urlStateManager.js";
 
 describe("URL State Manager", () => {
   let mockLocation: Location;
@@ -179,7 +179,7 @@ describe("URL State Manager", () => {
     it("should handle serialization errors gracefully", () => {
       // Create a circular reference to cause JSON.stringify to fail
       const circularState = { table: null, selection: null } as unknown as AppState;
-      circularState.table = circularState as unknown as AppState['table'];
+      circularState.table = circularState as unknown as AppState["table"];
 
       const result = serializeStateToURL(circularState);
       expect(result).toBe("");

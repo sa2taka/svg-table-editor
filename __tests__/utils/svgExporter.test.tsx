@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createTable, setCellStyle, setCellText } from "../src/models/TableDataModel.js";
-import { exportTableToSVG } from "../src/utils/svgExporter.js";
+import { createTable, setCellStyle, setCellText } from "../../src/models/TableDataModel.js";
+import { exportTableToSVG } from "../../src/utils/svgExporter.js";
 
 describe("SVG Exporter", () => {
   describe("exportTableToSVG", () => {

@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { ExcelBorderPicker } from "../src/components/ExcelBorderPicker.js";
-import { GridBorderStyle } from "../src/models/TableDataModel.js";
+import { ExcelBorderPicker } from "../../src/components/ExcelBorderPicker.js";
+import { GridBorderStyle } from "../../src/models/TableDataModel.js";
 
 describe("ExcelBorderPicker", () => {
   const mockGridBorderStyle: GridBorderStyle = {

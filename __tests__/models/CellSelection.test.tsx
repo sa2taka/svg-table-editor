@@ -5,7 +5,7 @@ import {
   getSelectionBounds,
   isCellSelected,
   isValidSelection,
-} from "../src/models/CellSelection.js";
+} from "../../src/models/CellSelection.js";
 
 describe("CellSelection", () => {
   describe("createCellSelection", () => {

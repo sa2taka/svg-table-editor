@@ -8,7 +8,7 @@ import {
   measureMultilineText,
   measureText,
   measureTextCached,
-} from "../src/utils/textMeasurement.js";
+} from "../../src/utils/textMeasurement.js";
 
 describe("Text Measurement", () => {
   const defaultFontStyle: FontStyle = {

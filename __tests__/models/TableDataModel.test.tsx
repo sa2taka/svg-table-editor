@@ -10,7 +10,7 @@ import {
   setCellStyle,
   setCellText,
   splitCells,
-} from "../src/models/TableDataModel.js";
+} from "../../src/models/TableDataModel.js";
 
 describe("TableDataModel", () => {
   describe("createTable", () => {

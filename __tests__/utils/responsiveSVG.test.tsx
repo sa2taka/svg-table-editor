@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createTable, setCellText } from "../src/models/TableDataModel.js";
-import { exportTableToSVG, SVGExportOptions } from "../src/utils/svgExporter.js";
+import { createTable, setCellText } from "../../src/models/TableDataModel.js";
+import { exportTableToSVG, SVGExportOptions } from "../../src/utils/svgExporter.js";
 
 describe("Responsive SVG Export", () => {
   const defaultOptions: SVGExportOptions = {
