@@ -54,12 +54,12 @@ describe("SVG Exporter", () => {
     it("should skip transparent background", () => {
       const table = createTable(1, 1);
       table.cells[0][0] = setCellStyle(table, 0, 0, {
-        backgroundColor: "transparent",
+        backgroundColor: "#00000000",
       }).cells[0][0];
 
       const svg = exportTableToSVG(table);
 
-      expect(svg).not.toContain('fill="transparent"');
+      expect(svg).not.toContain('fill="#00000000"');
     });
 
     it("should render cell borders", () => {
@@ -85,16 +85,16 @@ describe("SVG Exporter", () => {
       const table = createTable(1, 1);
       table.cells[0][0] = setCellStyle(table, 0, 0, {
         borderColor: {
-          top: "transparent",
-          right: "transparent",
-          bottom: "transparent",
-          left: "transparent",
+          top: "#00000000",
+          right: "#00000000",
+          bottom: "#00000000",
+          left: "#00000000",
         },
       }).cells[0][0];
 
       const svg = exportTableToSVG(table);
 
-      expect(svg).not.toContain('stroke="transparent"');
+      expect(svg).not.toContain('stroke="#00000000"');
     });
 
     it("should render text with proper alignment", () => {

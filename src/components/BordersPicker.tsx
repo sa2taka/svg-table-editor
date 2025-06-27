@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BorderStyle, GridBorderStyle } from "../models/TableDataModel.js";
+import { BorderStyle, DEFAULT_BORDER_COLOR, GridBorderStyle, TRANSPARENT_COLOR } from "../models/TableDataModel.js";
 import { ColorPalette } from "./ColorPalette.js";
 
 export interface BordersPickerProps {
@@ -38,43 +38,75 @@ export const BordersPicker = ({ cellBorder, onCellBorderChange, gridBorder, onGr
     }
   }, [showPicker]);
 
-  // プリセット境界線パターン
-  const applyPreset = (preset: "none" | "all" | "outer" | "grid") => {
+  // プリセット境界線パターン - より明確なUX
+  const applyPreset = (preset: "none" | "all" | "outline" | "inside") => {
+    const currentColor = getCurrentColor();
+    const borderColor = currentColor === "transparent" ? DEFAULT_BORDER_COLOR : currentColor;
+
+    // eslint-disable-next-line no-console
+    console.log("🔍 BordersPicker applyPreset:", {
+      preset,
+      currentColor,
+      borderColor,
+      cellBorder,
+      gridBorder,
+    });
+
     switch (preset) {
-      case "none":
-        onCellBorderChange({
-          top: "transparent",
-          right: "transparent",
-          bottom: "transparent",
-          left: "transparent",
-        });
+      case "none": {
+        // 選択セルの全境界線を透明に
+        const noneStyle = {
+          top: TRANSPARENT_COLOR,
+          right: TRANSPARENT_COLOR,
+          bottom: TRANSPARENT_COLOR,
+          left: TRANSPARENT_COLOR,
+        };
+        // eslint-disable-next-line no-console
+        console.log("🔍 Applying 'none' preset:", noneStyle);
+        onCellBorderChange(noneStyle);
         break;
-      case "all":
-        onCellBorderChange({
-          top: "#000000",
-          right: "#000000",
-          bottom: "#000000",
-          left: "#000000",
-        });
+      }
+      case "all": {
+        // 選択セルの全境界線を現在の色に
+        const allStyle = {
+          top: borderColor,
+          right: borderColor,
+          bottom: borderColor,
+          left: borderColor,
+        };
+        // eslint-disable-next-line no-console
+        console.log("🔍 Applying 'all' preset:", allStyle);
+        onCellBorderChange(allStyle);
         break;
-      case "outer":
-        onGridBorderChange({
+      }
+      case "outline": {
+        // 選択範囲の外枠のみ
+        const outlineStyle = {
           ...gridBorder,
           outer: {
-            top: "#000000",
-            right: "#000000",
-            bottom: "#000000",
-            left: "#000000",
+            top: borderColor,
+            right: borderColor,
+            bottom: borderColor,
+            left: borderColor,
           },
-        });
+        };
+        // eslint-disable-next-line no-console
+        console.log("🔍 Applying 'outline' preset:", outlineStyle);
+        onGridBorderChange(outlineStyle);
         break;
-      case "grid":
-        onGridBorderChange({
+      }
+      case "inside": {
+        // 選択範囲の内側グリッドのみ
+        const insideStyle = {
           outer: gridBorder.outer,
-          innerVertical: "#000000",
-          innerHorizontal: "#000000",
-        });
+          innerVertical: borderColor,
+          innerHorizontal: borderColor,
+        };
+        // eslint-disable-next-line no-console
+        console.log("🔍 Applying 'inside' preset:", insideStyle);
+        onGridBorderChange(insideStyle);
         break;
+      }
     }
   };
 
@@ -102,38 +134,47 @@ export const BordersPicker = ({ cellBorder, onCellBorderChange, gridBorder, onGr
   };
 
   const getCurrentColor = (): string => {
+    let color: string;
     if (mode === "cell") {
-      return cellBorder[selectedSide];
+      color = cellBorder[selectedSide];
     } else {
       switch (target) {
         case "outer":
-          return gridBorder.outer[selectedSide];
+          color = gridBorder.outer[selectedSide];
+          break;
         case "innerVertical":
-          return gridBorder.innerVertical;
+          color = gridBorder.innerVertical;
+          break;
         case "innerHorizontal":
-          return gridBorder.innerHorizontal;
+          color = gridBorder.innerHorizontal;
+          break;
         default:
-          return "#000000";
+          color = DEFAULT_BORDER_COLOR;
       }
     }
+    // Convert internal transparent to UI transparent
+    return color === TRANSPARENT_COLOR ? "transparent" : color;
   };
 
   const handleColorChange = (color: string) => {
+    // Convert UI transparent to internal transparent
+    const internalColor = color === "transparent" ? TRANSPARENT_COLOR : color;
+
     if (mode === "cell") {
-      handleCellBorderSide(selectedSide, color);
+      handleCellBorderSide(selectedSide, internalColor);
     } else {
       switch (target) {
         case "outer":
           handleGridBorderChange("outer", {
             ...gridBorder.outer,
-            [selectedSide]: color,
+            [selectedSide]: internalColor,
           });
           break;
         case "innerVertical":
-          handleGridBorderChange("innerVertical", color);
+          handleGridBorderChange("innerVertical", internalColor);
           break;
         case "innerHorizontal":
-          handleGridBorderChange("innerHorizontal", color);
+          handleGridBorderChange("innerHorizontal", internalColor);
           break;
       }
     }
@@ -162,10 +203,10 @@ export const BordersPicker = ({ cellBorder, onCellBorderChange, gridBorder, onGr
     position: "relative" as const,
     backgroundColor: "#fff",
     border: "3px solid",
-    borderTopColor: cellBorder.top === "transparent" ? "#ddd" : cellBorder.top,
-    borderRightColor: cellBorder.right === "transparent" ? "#ddd" : cellBorder.right,
-    borderBottomColor: cellBorder.bottom === "transparent" ? "#ddd" : cellBorder.bottom,
-    borderLeftColor: cellBorder.left === "transparent" ? "#ddd" : cellBorder.left,
+    borderTopColor: cellBorder.top === TRANSPARENT_COLOR ? "#ddd" : cellBorder.top,
+    borderRightColor: cellBorder.right === TRANSPARENT_COLOR ? "#ddd" : cellBorder.right,
+    borderBottomColor: cellBorder.bottom === TRANSPARENT_COLOR ? "#ddd" : cellBorder.bottom,
+    borderLeftColor: cellBorder.left === TRANSPARENT_COLOR ? "#ddd" : cellBorder.left,
     borderRadius: "2px",
   };
 
@@ -242,18 +283,25 @@ export const BordersPicker = ({ cellBorder, onCellBorderChange, gridBorder, onGr
             </button>
           </div>
 
+          {/* カラー選択エリア */}
+          <div style={{ marginBottom: "16px", padding: "12px", backgroundColor: "#f8f9fa", borderRadius: "6px" }}>
+            <div style={{ fontSize: "12px", marginBottom: "8px", color: "#666", fontWeight: "bold" }}>1. 境界線の色を選択:</div>
+            <ColorPalette value={getCurrentColor()} onChange={handleColorChange} label="Border Color" allowTransparent={true} />
+          </div>
+
           {/* プリセットボタン */}
-          <div style={{ marginBottom: "16px" }}>
-            <div style={{ fontSize: "12px", marginBottom: "8px", color: "#666" }}>Quick Presets:</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px" }}>
+          <div style={{ marginBottom: "16px", padding: "12px", backgroundColor: "#f0f8ff", borderRadius: "6px" }}>
+            <div style={{ fontSize: "12px", marginBottom: "8px", color: "#666", fontWeight: "bold" }}>2. 適用パターンを選択:</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <button
                 type="button"
                 style={presetButtonStyle}
                 onClick={() => {
                   applyPreset("none");
                 }}
+                title="すべての境界線を削除"
               >
-                🚫 No Borders
+                🚫 境界線なし
               </button>
               <button
                 type="button"
@@ -261,26 +309,29 @@ export const BordersPicker = ({ cellBorder, onCellBorderChange, gridBorder, onGr
                 onClick={() => {
                   applyPreset("all");
                 }}
+                title="選択セルのすべての境界線"
               >
-                ⬜ All Borders
+                ⬜ すべての境界線
               </button>
               <button
                 type="button"
                 style={presetButtonStyle}
                 onClick={() => {
-                  applyPreset("outer");
+                  applyPreset("outline");
                 }}
+                title="選択範囲の外枠のみ"
               >
-                🔲 Outer Only
+                🔲 外枠のみ
               </button>
               <button
                 type="button"
                 style={presetButtonStyle}
                 onClick={() => {
-                  applyPreset("grid");
+                  applyPreset("inside");
                 }}
+                title="選択範囲内のグリッド線"
               >
-                ⊞ Grid Lines
+                ⊞ 内側グリッド
               </button>
             </div>
           </div>

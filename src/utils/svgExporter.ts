@@ -1,4 +1,4 @@
-import { CellData, TableDataModel } from "../models/TableDataModel.js";
+import { CellData, TableDataModel, TRANSPARENT_COLOR } from "../models/TableDataModel.js";
 import { calculateOptimalCellSize, FontStyle } from "./textMeasurement.js";
 
 export interface SVGExportOptions {
@@ -240,15 +240,15 @@ function renderCell(cell: CellData, opts: Required<SVGExportOptions>, layout: Ta
   let cellContent = "";
 
   // Cell background
-  if (cell.style.backgroundColor && cell.style.backgroundColor !== "transparent") {
+  if (cell.style.backgroundColor && cell.style.backgroundColor !== TRANSPARENT_COLOR) {
     cellContent += `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${cell.style.backgroundColor}" class="cell-background"/>`;
   }
 
   // Cell borders
-  const borderTop = cell.style.borderColor.top !== "transparent" ? cell.style.borderColor.top : "none";
-  const borderRight = cell.style.borderColor.right !== "transparent" ? cell.style.borderColor.right : "none";
-  const borderBottom = cell.style.borderColor.bottom !== "transparent" ? cell.style.borderColor.bottom : "none";
-  const borderLeft = cell.style.borderColor.left !== "transparent" ? cell.style.borderColor.left : "none";
+  const borderTop = cell.style.borderColor.top !== TRANSPARENT_COLOR ? cell.style.borderColor.top : "none";
+  const borderRight = cell.style.borderColor.right !== TRANSPARENT_COLOR ? cell.style.borderColor.right : "none";
+  const borderBottom = cell.style.borderColor.bottom !== TRANSPARENT_COLOR ? cell.style.borderColor.bottom : "none";
+  const borderLeft = cell.style.borderColor.left !== TRANSPARENT_COLOR ? cell.style.borderColor.left : "none";
 
   // Draw borders
   if (borderTop !== "none") {

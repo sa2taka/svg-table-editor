@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTable, setCellText } from "../../src/models/TableDataModel.js";
+import { createTable, setCellStyle, setCellText } from "../../src/models/TableDataModel.js";
 import { exportTableToSVG, SVGExportOptions } from "../../src/utils/svgExporter.js";
 
 describe("Responsive SVG Export", () => {
@@ -34,6 +34,20 @@ describe("Responsive SVG Export", () => {
 
     it("should position cells correctly in fixed mode", () => {
       const table = createTable(2, 2);
+      // Add borders to cells so they appear in SVG
+      table.cells[0][0] = setCellStyle(table, 0, 0, {
+        borderColor: { top: "#000000", right: "#000000", bottom: "#000000", left: "#000000" },
+      }).cells[0][0];
+      table.cells[0][1] = setCellStyle(table, 0, 1, {
+        borderColor: { top: "#000000", right: "#000000", bottom: "#000000", left: "#000000" },
+      }).cells[0][1];
+      table.cells[1][0] = setCellStyle(table, 1, 0, {
+        borderColor: { top: "#000000", right: "#000000", bottom: "#000000", left: "#000000" },
+      }).cells[1][0];
+      table.cells[1][1] = setCellStyle(table, 1, 1, {
+        borderColor: { top: "#000000", right: "#000000", bottom: "#000000", left: "#000000" },
+      }).cells[1][1];
+
       const svg = exportTableToSVG(table, { ...defaultOptions, responsive: false });
 
       // Check for correct line positioning (borders show cell positions)

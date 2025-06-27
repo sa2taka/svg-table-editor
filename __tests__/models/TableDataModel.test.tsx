@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  BorderStyle,
   canMergeRange,
   canSplitCell,
   createTable,
@@ -255,6 +256,56 @@ describe("TableDataModel", () => {
 
       expect(getCell(expandedMerge, 1, 1).merged).toBe(true);
       expect(getCell(expandedMerge, 2, 2).merged).toBe(true);
+    });
+  });
+
+  describe("adjacent border synchronization", () => {
+    it("should sync multiple borders simultaneously", () => {
+      const table = createTable(3, 3);
+
+      // Set all borders of middle cell using complete BorderStyle
+      const updatedTable = setCellStyle(table, 1, 1, {
+        borderColor: {
+          top: "#ff0000",
+          right: "#00ff00",
+          bottom: "#0000ff",
+          left: "#ffff00",
+        },
+      });
+
+      // Check all adjacent cells
+      expect(getCell(updatedTable, 0, 1).style.borderColor.bottom).toBe("#ff0000"); // top
+      expect(getCell(updatedTable, 1, 2).style.borderColor.left).toBe("#00ff00"); // right
+      expect(getCell(updatedTable, 2, 1).style.borderColor.top).toBe("#0000ff"); // bottom
+      expect(getCell(updatedTable, 1, 0).style.borderColor.right).toBe("#ffff00"); // left
+    });
+
+    it("should handle edge cells without errors", () => {
+      const table = createTable(2, 2);
+
+      // Set borders for corner cell (0,0) - no adjacent cells above or left
+      expect(() => {
+        setCellStyle(table, 0, 0, {
+          borderColor: {
+            top: "#ff0000",
+            right: "#000000", 
+            bottom: "#000000",
+            left: "#00ff00",
+          },
+        });
+      }).not.toThrow();
+
+      // Set borders for opposite corner cell (1,1) - no adjacent cells below or right
+      expect(() => {
+        setCellStyle(table, 1, 1, {
+          borderColor: {
+            top: "#000000",
+            right: "#ffff00",
+            bottom: "#0000ff",
+            left: "#000000",
+          },
+        });
+      }).not.toThrow();
     });
   });
 });

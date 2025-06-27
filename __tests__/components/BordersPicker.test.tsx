@@ -61,7 +61,7 @@ describe("BordersPicker", () => {
 
     expect(screen.getByText("Individual Cell")).toBeInTheDocument();
     expect(screen.getByText("Selection Range")).toBeInTheDocument();
-    expect(screen.getByText("Quick Presets:")).toBeInTheDocument();
+    expect(screen.getByText("2. 適用パターンを選択:")).toBeInTheDocument();
   });
 
   it("should display preset buttons", async () => {
@@ -79,10 +79,10 @@ describe("BordersPicker", () => {
     const button = screen.getByText("Borders");
     await user.click(button);
 
-    expect(screen.getByText("🚫 No Borders")).toBeInTheDocument();
-    expect(screen.getByText("⬜ All Borders")).toBeInTheDocument();
-    expect(screen.getByText("🔲 Outer Only")).toBeInTheDocument();
-    expect(screen.getByText("⊞ Grid Lines")).toBeInTheDocument();
+    expect(screen.getByText("🚫 境界線なし")).toBeInTheDocument();
+    expect(screen.getByText("⬜ すべての境界線")).toBeInTheDocument();
+    expect(screen.getByText("🔲 外枠のみ")).toBeInTheDocument();
+    expect(screen.getByText("⊞ 内側グリッド")).toBeInTheDocument();
   });
 
   it("should apply 'no borders' preset", async () => {
@@ -100,14 +100,14 @@ describe("BordersPicker", () => {
     const button = screen.getByText("Borders");
     await user.click(button);
 
-    const noBordersButton = screen.getByText("🚫 No Borders");
+    const noBordersButton = screen.getByText("🚫 境界線なし");
     await user.click(noBordersButton);
 
     expect(mockOnCellBorderChange).toHaveBeenCalledWith({
-      top: "transparent",
-      right: "transparent",
-      bottom: "transparent",
-      left: "transparent",
+      top: "#00000000",
+      right: "#00000000",
+      bottom: "#00000000",
+      left: "#00000000",
     });
   });
 
@@ -126,7 +126,7 @@ describe("BordersPicker", () => {
     const button = screen.getByText("Borders");
     await user.click(button);
 
-    const allBordersButton = screen.getByText("⬜ All Borders");
+    const allBordersButton = screen.getByText("⬜ すべての境界線");
     await user.click(allBordersButton);
 
     expect(mockOnCellBorderChange).toHaveBeenCalledWith({
@@ -229,7 +229,7 @@ describe("BordersPicker", () => {
     const button = screen.getByText("Borders");
     await user.click(button);
 
-    expect(screen.getByText("Quick Presets:")).toBeInTheDocument();
+    expect(screen.getByText("2. 適用パターンを選択:")).toBeInTheDocument();
 
     const closeButton = screen.getByText("Close");
     await user.click(closeButton);
@@ -254,7 +254,7 @@ describe("BordersPicker", () => {
     const user = userEvent.setup();
     await user.click(button);
 
-    expect(screen.getByText("Quick Presets:")).toBeInTheDocument();
+    expect(screen.getByText("2. 適用パターンを選択:")).toBeInTheDocument();
 
     // 外側をクリック
     const outsideElement = screen.getByTestId("outside");
@@ -278,7 +278,7 @@ describe("BordersPicker", () => {
     const button = screen.getByText("Borders");
     await user.click(button);
 
-    const outerButton = screen.getByText("🔲 Outer Only");
+    const outerButton = screen.getByText("🔲 外枠のみ");
     await user.click(outerButton);
 
     expect(mockOnGridBorderChange).toHaveBeenCalledWith({
@@ -307,7 +307,7 @@ describe("BordersPicker", () => {
     const button = screen.getByText("Borders");
     await user.click(button);
 
-    const gridButton = screen.getByText("⊞ Grid Lines");
+    const gridButton = screen.getByText("⊞ 内側グリッド");
     await user.click(gridButton);
 
     expect(mockOnGridBorderChange).toHaveBeenCalledWith({

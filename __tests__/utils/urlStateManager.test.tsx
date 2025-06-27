@@ -121,6 +121,42 @@ describe("URL State Manager", () => {
       expect(deserialized?.table.rows).toBe(1);
     });
 
+    it("should serialize and deserialize gridStyle information", () => {
+      const table = createTable(2, 2);
+      // Add grid style to the table
+      table.gridStyle = {
+        innerVertical: "#ff0000",
+        innerHorizontal: "#00ff00",
+      };
+
+      const state: AppState = { table, selection: null };
+      const serialized = serializeStateToURL(state);
+      const deserialized = deserializeStateFromURL(serialized);
+
+      expect(deserialized).not.toBeNull();
+      expect(deserialized?.table.gridStyle).toBeDefined();
+      expect(deserialized?.table.gridStyle?.innerVertical).toBe("#ff0000");
+      expect(deserialized?.table.gridStyle?.innerHorizontal).toBe("#00ff00");
+    });
+
+    it("should serialize and deserialize default black gridStyle colors", () => {
+      const table = createTable(2, 2);
+      // Keep default black colors
+      table.gridStyle = {
+        innerVertical: "#000000",
+        innerHorizontal: "#000000",
+      };
+
+      const state: AppState = { table, selection: null };
+      const serialized = serializeStateToURL(state);
+      const deserialized = deserializeStateFromURL(serialized);
+
+      expect(deserialized).not.toBeNull();
+      expect(deserialized?.table.gridStyle).toBeDefined();
+      expect(deserialized?.table.gridStyle?.innerVertical).toBe("#000000");
+      expect(deserialized?.table.gridStyle?.innerHorizontal).toBe("#000000");
+    });
+
     it("should handle invalid serialized data", () => {
       expect(deserializeStateFromURL("")).toBeNull();
       expect(deserializeStateFromURL("invalid-base64")).toBeNull();

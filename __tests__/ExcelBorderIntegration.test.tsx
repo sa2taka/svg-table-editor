@@ -29,8 +29,8 @@ describe("Borders Integration", () => {
     // Check if dropdown opened by looking for specific border options
     expect(screen.getByText("Individual Cell")).toBeInTheDocument();
     expect(screen.getByText("Selection Range")).toBeInTheDocument();
-    expect(screen.getByText("Quick Presets:")).toBeInTheDocument();
-    expect(screen.getByText("🚫 No Borders")).toBeInTheDocument();
+    expect(screen.getByText("2. 適用パターンを選択:")).toBeInTheDocument();
+    expect(screen.getByText("🚫 境界線なし")).toBeInTheDocument();
   });
 
   it("should render table with cells", () => {

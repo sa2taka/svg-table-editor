@@ -82,12 +82,24 @@ const App = () => {
   };
 
   const handleStyleChange = (style: Partial<CellStyle>) => {
+    // eslint-disable-next-line no-console
+    console.log("🔍 App handleStyleChange:", style, "selection:", selection);
     if (selection) {
       const selectedCells = getSelectedCells(selection);
+      // eslint-disable-next-line no-console
+      console.log("🔍 App selectedCells:", selectedCells);
       setTable((prevTable) => {
         let updatedTable = prevTable;
         selectedCells.forEach(({ row, column }) => {
+          // eslint-disable-next-line no-console
+          console.log(`🔍 App applying style to cell (${row}, ${column}):`, style);
+          const oldCell = updatedTable.cells[row][column];
+          // eslint-disable-next-line no-console
+          console.log(`🔍 App before setCellStyle - old border:`, oldCell.style.borderColor);
           updatedTable = setCellStyle(updatedTable, row, column, style);
+          const newCell = updatedTable.cells[row][column];
+          // eslint-disable-next-line no-console
+          console.log(`🔍 App after setCellStyle - new border:`, newCell.style.borderColor);
         });
         return updatedTable;
       });
@@ -95,6 +107,8 @@ const App = () => {
   };
 
   const handleExcelBorderChange = (gridBorder: GridBorderStyle) => {
+    // eslint-disable-next-line no-console
+    console.log("🔍 App handleExcelBorderChange:", gridBorder, "selection:", selection);
     if (selection) {
       const selectedCells = getSelectedCells(selection);
       const bounds = getSelectionBounds(selection);

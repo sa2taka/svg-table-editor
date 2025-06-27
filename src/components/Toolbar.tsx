@@ -1,4 +1,4 @@
-import { BorderStyle, CellStyle, GridBorderStyle } from "../models/TableDataModel.js";
+import { BorderStyle, CellStyle, GridBorderStyle, TRANSPARENT_COLOR } from "../models/TableDataModel.js";
 import { BordersPicker } from "./BordersPicker.js";
 import { ColorPalette } from "./ColorPalette.js";
 
@@ -73,11 +73,15 @@ export const Toolbar = ({
 
   const handleBackgroundColorChange = (backgroundColor: string) => {
     if (onStyleChange) {
-      onStyleChange({ backgroundColor });
+      // Convert "transparent" to our internal representation
+      const internalColor = backgroundColor === "transparent" ? TRANSPARENT_COLOR : backgroundColor;
+      onStyleChange({ backgroundColor: internalColor });
     }
   };
 
   const handleBorderColorChange = (borderColor: BorderStyle) => {
+    // eslint-disable-next-line no-console
+    console.log("🔍 Toolbar handleBorderColorChange:", borderColor);
     if (onStyleChange) {
       onStyleChange({ borderColor });
     }
@@ -208,7 +212,9 @@ export const Toolbar = ({
         <span style={groupTitleStyle}>Colors</span>
         <ColorPalette value={selectedCellStyle?.color ?? "#000000"} onChange={handleColorChange} label="Text" />
         <ColorPalette
-          value={selectedCellStyle?.backgroundColor ?? "transparent"}
+          value={
+            selectedCellStyle?.backgroundColor === TRANSPARENT_COLOR ? "transparent" : (selectedCellStyle?.backgroundColor ?? "transparent")
+          }
           onChange={handleBackgroundColorChange}
           label="Background"
           allowTransparent={true}

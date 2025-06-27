@@ -1,3 +1,7 @@
+// Constants for color values
+export const TRANSPARENT_COLOR = "#00000000";
+export const DEFAULT_BORDER_COLOR = "#000000";
+
 export interface BorderStyle {
   top: string;
   right: string;
@@ -43,10 +47,10 @@ export interface TableDataModel {
 }
 
 const DEFAULT_BORDER_STYLE: BorderStyle = {
-  top: "#000000",
-  right: "#000000",
-  bottom: "#000000",
-  left: "#000000",
+  top: DEFAULT_BORDER_COLOR,
+  right: DEFAULT_BORDER_COLOR,
+  bottom: DEFAULT_BORDER_COLOR,
+  left: DEFAULT_BORDER_COLOR,
 };
 
 const DEFAULT_STYLE: CellStyle = {
@@ -54,7 +58,7 @@ const DEFAULT_STYLE: CellStyle = {
   color: "#000000",
   fontFamily: "Arial",
   textAlign: "left",
-  backgroundColor: "transparent",
+  backgroundColor: TRANSPARENT_COLOR,
   borderColor: { ...DEFAULT_BORDER_STYLE },
 };
 
@@ -103,11 +107,56 @@ export function setCellText(table: TableDataModel, row: number, column: number, 
 
 export function setCellStyle(table: TableDataModel, row: number, column: number, style: Partial<CellStyle>): TableDataModel {
   const newTable = cloneTable(table);
-  newTable.cells[row][column].style = {
-    ...newTable.cells[row][column].style,
-    ...style,
-  };
+  const currentCell = newTable.cells[row][column];
+
+  // Properly merge borderColor object
+  if (style.borderColor) {
+    currentCell.style = {
+      ...currentCell.style,
+      ...style,
+      borderColor: {
+        ...currentCell.style.borderColor,
+        ...style.borderColor,
+      },
+    };
+
+    // Sync adjacent cell borders to maintain consistency
+    syncAdjacentBorders(newTable, row, column, style.borderColor);
+  } else {
+    currentCell.style = {
+      ...currentCell.style,
+      ...style,
+    };
+  }
+
   return newTable;
+}
+
+// 隣接セルの境界線を同期する関数
+function syncAdjacentBorders(table: TableDataModel, row: number, column: number, borderColor: Partial<BorderStyle>): void {
+  // 上のセル (row-1) の bottom を current の top と同期
+  if (borderColor.top !== undefined && row > 0) {
+    const topCell = table.cells[row - 1][column];
+    topCell.style.borderColor.bottom = borderColor.top;
+  }
+
+  // 右のセル (column+1) の left を current の right と同期
+  if (borderColor.right !== undefined && column < table.columns - 1) {
+    const rightCell = table.cells[row][column + 1];
+    rightCell.style.borderColor.left = borderColor.right;
+  }
+
+  // 下のセル (row+1) の top を current の bottom と同期
+  if (borderColor.bottom !== undefined && row < table.rows - 1) {
+    const bottomCell = table.cells[row + 1][column];
+    bottomCell.style.borderColor.top = borderColor.bottom;
+  }
+
+  // 左のセル (column-1) の right を current の left と同期
+  if (borderColor.left !== undefined && column > 0) {
+    const leftCell = table.cells[row][column - 1];
+    leftCell.style.borderColor.right = borderColor.left;
+  }
 }
 
 export function mergeCells(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): TableDataModel {

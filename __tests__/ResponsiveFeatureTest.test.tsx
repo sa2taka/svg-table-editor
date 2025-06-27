@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTable, setCellText } from "../src/models/TableDataModel.js";
+import { createTable, setCellStyle, setCellText } from "../src/models/TableDataModel.js";
 import { exportTableToSVG } from "../src/utils/svgExporter.js";
 
 describe("Responsive Feature Integration Test", () => {
@@ -63,6 +63,9 @@ describe("Responsive Feature Integration Test", () => {
     // Create a simple table
     let table = createTable(1, 1);
     table = setCellText(table, 0, 0, "Test cell with some content");
+    table = setCellStyle(table, 0, 0, {
+      borderColor: { top: "#000000", right: "#000000", bottom: "#000000", left: "#000000" },
+    });
 
     const svg = exportTableToSVG(table, testOptions);
 
