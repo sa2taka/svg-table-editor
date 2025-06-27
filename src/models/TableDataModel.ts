@@ -1,6 +1,17 @@
-// Constants for color values
-export const TRANSPARENT_COLOR = "#00000000";
-export const DEFAULT_BORDER_COLOR = "#000000";
+import {
+  DEFAULT_BACKGROUND_COLOR,
+  DEFAULT_BORDER_COLOR,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_TEXT_COLOR,
+  ERROR_MESSAGES,
+  FontFamily,
+  FontWeight,
+  TextAlign,
+} from "./tableConstants.js";
+
+// Re-export types and constants for convenience
+export { DEFAULT_BORDER_COLOR, TRANSPARENT_COLOR } from "./tableConstants.js";
+export type { FontFamily, FontWeight, TextAlign } from "./tableConstants.js";
 
 export interface BorderStyle {
   top: string;
@@ -16,10 +27,10 @@ export interface GridBorderStyle {
 }
 
 export interface CellStyle {
-  fontWeight: "normal" | "bold";
+  fontWeight: FontWeight;
   color: string;
-  fontFamily: string;
-  textAlign: "left" | "center" | "right";
+  fontFamily: FontFamily;
+  textAlign: TextAlign;
   backgroundColor: string;
   borderColor: BorderStyle;
 }
@@ -55,10 +66,10 @@ const DEFAULT_BORDER_STYLE: BorderStyle = {
 
 const DEFAULT_STYLE: CellStyle = {
   fontWeight: "normal",
-  color: "#000000",
-  fontFamily: "Arial",
+  color: DEFAULT_TEXT_COLOR,
+  fontFamily: DEFAULT_FONT_FAMILY,
   textAlign: "left",
-  backgroundColor: TRANSPARENT_COLOR,
+  backgroundColor: DEFAULT_BACKGROUND_COLOR,
   borderColor: { ...DEFAULT_BORDER_STYLE },
 };
 
@@ -94,7 +105,7 @@ export function createTable(rows: number, columns: number): TableDataModel {
 
 export function getCell(table: TableDataModel, row: number, column: number): CellData {
   if (row < 0 || row >= table.rows || column < 0 || column >= table.columns) {
-    throw new Error("Invalid cell position");
+    throw new Error(ERROR_MESSAGES.INVALID_CELL_POSITION);
   }
   return table.cells[row][column];
 }
@@ -164,11 +175,11 @@ export function mergeCells(table: TableDataModel, startRow: number, startCol: nu
 
   // Validate merge range
   if (startRow < 0 || startCol < 0 || endRow >= table.rows || endCol >= table.columns) {
-    throw new Error("Invalid merge range");
+    throw new Error(ERROR_MESSAGES.INVALID_MERGE_RANGE);
   }
 
   if (startRow > endRow || startCol > endCol) {
-    throw new Error("Invalid merge range: start must be before end");
+    throw new Error(ERROR_MESSAGES.MERGE_RANGE_START_BEFORE_END);
   }
 
   // Check if any cells in the range are already merged
@@ -176,7 +187,7 @@ export function mergeCells(table: TableDataModel, startRow: number, startCol: nu
     for (let col = startCol; col <= endCol; col++) {
       const cell = newTable.cells[row][col];
       if (cell.merged || cell.rowSpan > 1 || cell.colSpan > 1) {
-        throw new Error("Cannot merge: range contains already merged cells");
+        throw new Error(ERROR_MESSAGES.CANNOT_MERGE_EXISTING_MERGED_CELLS);
       }
     }
   }
@@ -218,7 +229,7 @@ export function splitCells(table: TableDataModel, row: number, column: number): 
     if (cell.mainCellRow !== undefined && cell.mainCellColumn !== undefined) {
       return splitCells(newTable, cell.mainCellRow, cell.mainCellColumn);
     }
-    throw new Error("Invalid merged cell: missing main cell reference");
+    throw new Error(ERROR_MESSAGES.INVALID_MERGED_CELL_REFERENCE);
   }
 
   if (cell.rowSpan === 1 && cell.colSpan === 1) {
@@ -392,7 +403,7 @@ export function addRow(table: TableDataModel, rowIndex: number): TableDataModel 
 
 export function removeRow(table: TableDataModel, rowIndex: number): TableDataModel {
   if (table.rows <= 1) {
-    throw new Error("Cannot remove row: table must have at least one row");
+    throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_ROW_MIN_REQUIRED);
   }
 
   const newTable = cloneTable(table);
@@ -401,7 +412,7 @@ export function removeRow(table: TableDataModel, rowIndex: number): TableDataMod
   for (let col = 0; col < newTable.columns; col++) {
     const cell = newTable.cells[rowIndex][col];
     if (cell.rowSpan > 1 || (cell.merged && cell.mainCellRow !== rowIndex)) {
-      throw new Error("Cannot remove row: contains merged cells");
+      throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_ROW_CONTAINS_MERGED);
     }
   }
 
@@ -463,7 +474,7 @@ export function addColumn(table: TableDataModel, columnIndex: number): TableData
 
 export function removeColumn(table: TableDataModel, columnIndex: number): TableDataModel {
   if (table.columns <= 1) {
-    throw new Error("Cannot remove column: table must have at least one column");
+    throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_COLUMN_MIN_REQUIRED);
   }
 
   const newTable = cloneTable(table);
@@ -472,7 +483,7 @@ export function removeColumn(table: TableDataModel, columnIndex: number): TableD
   for (let row = 0; row < newTable.rows; row++) {
     const cell = newTable.cells[row][columnIndex];
     if (cell.colSpan > 1 || (cell.merged && cell.mainCellColumn !== columnIndex)) {
-      throw new Error("Cannot remove column: contains merged cells");
+      throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_COLUMN_CONTAINS_MERGED);
     }
   }
 

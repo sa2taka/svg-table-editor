@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  BorderStyle,
   canMergeRange,
   canSplitCell,
   createTable,
@@ -288,7 +287,7 @@ describe("TableDataModel", () => {
         setCellStyle(table, 0, 0, {
           borderColor: {
             top: "#ff0000",
-            right: "#000000", 
+            right: "#000000",
             bottom: "#000000",
             left: "#00ff00",
           },
