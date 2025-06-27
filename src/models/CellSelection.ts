@@ -19,7 +19,7 @@ export interface SelectionBounds {
   columnCount: number;
 }
 
-export const createCellSelection = (startRow: number, startColumn: number, endRow: number, endColumn: number): CellSelection => {
+export function createCellSelection(startRow: number, startColumn: number, endRow: number, endColumn: number): CellSelection {
   // Normalize coordinates to ensure start is always top-left
   const minRow = Math.min(startRow, endRow);
   const maxRow = Math.max(startRow, endRow);
@@ -32,13 +32,13 @@ export const createCellSelection = (startRow: number, startColumn: number, endRo
     endRow: maxRow,
     endColumn: maxColumn,
   };
-};
+}
 
-export const isCellSelected = (selection: CellSelection, row: number, column: number): boolean => {
+export function isCellSelected(selection: CellSelection, row: number, column: number): boolean {
   return row >= selection.startRow && row <= selection.endRow && column >= selection.startColumn && column <= selection.endColumn;
-};
+}
 
-export const getSelectedCells = (selection: CellSelection): CellPosition[] => {
+export function getSelectedCells(selection: CellSelection): CellPosition[] {
   const cells: CellPosition[] = [];
 
   for (let row = selection.startRow; row <= selection.endRow; row++) {
@@ -48,13 +48,13 @@ export const getSelectedCells = (selection: CellSelection): CellPosition[] => {
   }
 
   return cells;
-};
+}
 
-export const isValidSelection = (selection: CellSelection, tableRows: number, tableColumns: number): boolean => {
+export function isValidSelection(selection: CellSelection, tableRows: number, tableColumns: number): boolean {
   return selection.startRow >= 0 && selection.startColumn >= 0 && selection.endRow < tableRows && selection.endColumn < tableColumns;
-};
+}
 
-export const getSelectionBounds = (selection: CellSelection): SelectionBounds => {
+export function getSelectionBounds(selection: CellSelection): SelectionBounds {
   return {
     minRow: selection.startRow,
     maxRow: selection.endRow,
@@ -63,8 +63,8 @@ export const getSelectionBounds = (selection: CellSelection): SelectionBounds =>
     rowCount: selection.endRow - selection.startRow + 1,
     columnCount: selection.endColumn - selection.startColumn + 1,
   };
-};
+}
 
-export const isSingleCellSelection = (selection: CellSelection): boolean => {
+export function isSingleCellSelection(selection: CellSelection): boolean {
   return selection.startRow === selection.endRow && selection.startColumn === selection.endColumn;
-};
+}
