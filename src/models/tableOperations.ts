@@ -3,6 +3,24 @@ import { DEFAULT_BORDER_STYLE, DEFAULT_STYLE, type BorderStyle, type CellData, t
 
 // Private utility functions for table operations
 
+// Custom clone function for deep copying table data
+function cloneTable(table: TableDataModel): TableDataModel {
+  return {
+    rows: table.rows,
+    columns: table.columns,
+    cells: table.cells.map((row) =>
+      row.map((cell) => ({
+        ...cell,
+        style: {
+          ...cell.style,
+          borderColor: { ...cell.style.borderColor },
+        },
+      }))
+    ),
+    gridStyle: table.gridStyle ? { ...table.gridStyle } : undefined,
+  };
+}
+
 // Utility function to iterate over cells in a range
 function forEachCellInRange(
   table: TableDataModel,
@@ -120,13 +138,13 @@ export function getCell(table: TableDataModel, row: number, column: number): Cel
 }
 
 export function setCellText(table: TableDataModel, row: number, column: number, text: string): TableDataModel {
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
   newTable.cells[row][column].text = text;
   return newTable;
 }
 
 export function setCellStyle(table: TableDataModel, row: number, column: number, style: Partial<CellStyle>): TableDataModel {
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
   const currentCell = newTable.cells[row][column];
 
   // Properly merge borderColor object
@@ -153,7 +171,7 @@ export function setCellStyle(table: TableDataModel, row: number, column: number,
 }
 
 export function mergeCells(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): TableDataModel {
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
 
   // Validate merge operation
   validateMergeRangeBounds(newTable, startRow, startCol, endRow, endCol);
@@ -176,7 +194,7 @@ export function mergeCells(table: TableDataModel, startRow: number, startCol: nu
 }
 
 export function splitCells(table: TableDataModel, row: number, column: number): TableDataModel {
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
   const cell = getCell(newTable, row, column);
 
   if (cell.merged) {
@@ -288,7 +306,7 @@ export function mergeRangeWithExpansion(
   endCol: number
 ): TableDataModel {
   // First, split any existing merged cells in the range
-  let newTable = structuredClone(table);
+  let newTable = cloneTable(table);
 
   const expandedRange = getExpandedMergeRange(newTable, startRow, startCol, endRow, endCol);
 
@@ -307,7 +325,7 @@ export function mergeRangeWithExpansion(
 }
 
 export function addRow(table: TableDataModel, rowIndex: number): TableDataModel {
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
 
   // Create new row with default cells
   const newRow: CellData[] = [];
@@ -348,7 +366,7 @@ export function removeRow(table: TableDataModel, rowIndex: number): TableDataMod
     throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_ROW_MIN_REQUIRED);
   }
 
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
 
   // Check for merged cells that would be broken
   for (let col = 0; col < newTable.columns; col++) {
@@ -379,7 +397,7 @@ export function removeRow(table: TableDataModel, rowIndex: number): TableDataMod
 }
 
 export function addColumn(table: TableDataModel, columnIndex: number): TableDataModel {
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
 
   // Add new cell to each row
   for (let row = 0; row < newTable.rows; row++) {
@@ -419,7 +437,7 @@ export function removeColumn(table: TableDataModel, columnIndex: number): TableD
     throw new Error(ERROR_MESSAGES.CANNOT_REMOVE_COLUMN_MIN_REQUIRED);
   }
 
-  const newTable = structuredClone(table);
+  const newTable = cloneTable(table);
 
   // Check for merged cells that would be broken
   for (let row = 0; row < newTable.rows; row++) {
