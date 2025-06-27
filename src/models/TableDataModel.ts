@@ -143,6 +143,58 @@ export function setCellStyle(table: TableDataModel, row: number, column: number,
   return newTable;
 }
 
+// Private utility functions for table operations
+
+// Utility function to iterate over cells in a range
+function forEachCellInRange(
+  table: TableDataModel,
+  startRow: number,
+  startCol: number,
+  endRow: number,
+  endCol: number,
+  callback: (cell: CellData, row: number, col: number) => void
+): void {
+  for (let row = startRow; row <= endRow; row++) {
+    for (let col = startCol; col <= endCol; col++) {
+      callback(table.cells[row][col], row, col);
+    }
+  }
+}
+
+// Validation functions for merge operations
+function validateMergeRangeBounds(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): void {
+  if (startRow < 0 || startCol < 0 || endRow >= table.rows || endCol >= table.columns) {
+    throw new Error(ERROR_MESSAGES.INVALID_MERGE_RANGE);
+  }
+
+  if (startRow > endRow || startCol > endCol) {
+    throw new Error(ERROR_MESSAGES.MERGE_RANGE_START_BEFORE_END);
+  }
+}
+
+function validateNoExistingMergedCells(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): void {
+  forEachCellInRange(table, startRow, startCol, endRow, endCol, (cell) => {
+    if (cell.merged || cell.rowSpan > 1 || cell.colSpan > 1) {
+      throw new Error(ERROR_MESSAGES.CANNOT_MERGE_EXISTING_MERGED_CELLS);
+    }
+  });
+}
+
+// Worker function for merge operations
+function markSecondaryCellsAsMerged(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): void {
+  forEachCellInRange(table, startRow, startCol, endRow, endCol, (cell, row, col) => {
+    if (row === startRow && col === startCol) {
+      return; // Skip main cell
+    }
+
+    cell.merged = true;
+    cell.mainCellRow = startRow;
+    cell.mainCellColumn = startCol;
+    cell.rowSpan = 1;
+    cell.colSpan = 1;
+  });
+}
+
 // 隣接セルの境界線を同期する関数
 function syncAdjacentBorders(table: TableDataModel, row: number, column: number, borderColor: Partial<BorderStyle>): void {
   // 上のセル (row-1) の bottom を current の top と同期
@@ -173,49 +225,22 @@ function syncAdjacentBorders(table: TableDataModel, row: number, column: number,
 export function mergeCells(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): TableDataModel {
   const newTable = cloneTable(table);
 
-  // Validate merge range
-  if (startRow < 0 || startCol < 0 || endRow >= table.rows || endCol >= table.columns) {
-    throw new Error(ERROR_MESSAGES.INVALID_MERGE_RANGE);
-  }
+  // Validate merge operation
+  validateMergeRangeBounds(newTable, startRow, startCol, endRow, endCol);
+  validateNoExistingMergedCells(newTable, startRow, startCol, endRow, endCol);
 
-  if (startRow > endRow || startCol > endCol) {
-    throw new Error(ERROR_MESSAGES.MERGE_RANGE_START_BEFORE_END);
-  }
-
-  // Check if any cells in the range are already merged
-  for (let row = startRow; row <= endRow; row++) {
-    for (let col = startCol; col <= endCol; col++) {
-      const cell = newTable.cells[row][col];
-      if (cell.merged || cell.rowSpan > 1 || cell.colSpan > 1) {
-        throw new Error(ERROR_MESSAGES.CANNOT_MERGE_EXISTING_MERGED_CELLS);
-      }
-    }
-  }
-
+  // Calculate span values
   const rowSpan = endRow - startRow + 1;
   const colSpan = endCol - startCol + 1;
 
-  // Set main cell properties
+  // Configure main cell
   const mainCell = newTable.cells[startRow][startCol];
   mainCell.rowSpan = rowSpan;
   mainCell.colSpan = colSpan;
   mainCell.merged = false;
 
-  // Mark other cells as merged
-  for (let row = startRow; row <= endRow; row++) {
-    for (let col = startCol; col <= endCol; col++) {
-      if (row === startRow && col === startCol) {
-        continue; // Skip main cell
-      }
-
-      const cell = newTable.cells[row][col];
-      cell.merged = true;
-      cell.mainCellRow = startRow;
-      cell.mainCellColumn = startCol;
-      cell.rowSpan = 1;
-      cell.colSpan = 1;
-    }
-  }
+  // Mark secondary cells as merged
+  markSecondaryCellsAsMerged(newTable, startRow, startCol, endRow, endCol);
 
   return newTable;
 }
@@ -257,31 +282,18 @@ export function splitCells(table: TableDataModel, row: number, column: number): 
 }
 
 export function canMergeRange(table: TableDataModel, startRow: number, startCol: number, endRow: number, endCol: number): boolean {
-  // Validate range bounds
-  if (startRow < 0 || startCol < 0 || endRow >= table.rows || endCol >= table.columns) {
-    return false;
-  }
-
-  if (startRow > endRow || startCol > endCol) {
-    return false;
-  }
-
   // Single cell cannot be merged
   if (startRow === endRow && startCol === endCol) {
     return false;
   }
 
-  // Check if any cells in the range are already merged
-  for (let row = startRow; row <= endRow; row++) {
-    for (let col = startCol; col <= endCol; col++) {
-      const cell = table.cells[row][col];
-      if (cell.merged || cell.rowSpan > 1 || cell.colSpan > 1) {
-        return false;
-      }
-    }
+  try {
+    validateMergeRangeBounds(table, startRow, startCol, endRow, endCol);
+    validateNoExistingMergedCells(table, startRow, startCol, endRow, endCol);
+    return true;
+  } catch {
+    return false;
   }
-
-  return true;
 }
 
 export function canSplitCell(table: TableDataModel, row: number, column: number): boolean {
