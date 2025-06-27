@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { SVGPreviewModal } from "./components/SVGPreviewModal.js";
 import { TableEditor } from "./components/TableEditor.js";
 import { Toolbar } from "./components/Toolbar.js";
+import { TSVImportModal } from "./components/TSVImportModal.js";
 import { CellSelection, getSelectedCells, getSelectionBounds } from "./models/CellSelection.js";
 import {
   addColumn,
@@ -54,6 +55,12 @@ const App = () => {
   }>({
     isOpen: false,
     svgContent: "",
+  });
+
+  const [tsvImportModal, setTsvImportModal] = useState<{
+    isOpen: boolean;
+  }>({
+    isOpen: false,
   });
 
   // Debounced URL update to avoid excessive URL changes
@@ -216,35 +223,11 @@ const App = () => {
     }
   };
 
-  const handleRemoveRow = () => {
-    try {
-      setTable((prevTable) => removeRow(prevTable, prevTable.rows - 1));
-      // Clear selection if it's outside the new table bounds
-      if (selection && selection.endRow >= table.rows - 1) {
-        setSelection(null);
-      }
-    } catch (error) {
-      alert(`Cannot remove row: ${error instanceof Error ? error.message : "Unknown error"}`);
-    }
-  };
-
   const handleAddColumn = () => {
     try {
       setTable((prevTable) => addColumn(prevTable, prevTable.columns));
     } catch (error) {
       alert(`Cannot add column: ${error instanceof Error ? error.message : "Unknown error"}`);
-    }
-  };
-
-  const handleRemoveColumn = () => {
-    try {
-      setTable((prevTable) => removeColumn(prevTable, prevTable.columns - 1));
-      // Clear selection if it's outside the new table bounds
-      if (selection && selection.endColumn >= table.columns - 1) {
-        setSelection(null);
-      }
-    } catch (error) {
-      alert(`Cannot remove column: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   };
 
@@ -403,6 +386,22 @@ const App = () => {
     }
   };
 
+  const handleTSVImport = () => {
+    setTsvImportModal({ isOpen: true });
+  };
+
+  const handleTSVImportClose = () => {
+    setTsvImportModal({ isOpen: false });
+  };
+
+  const handleTSVImportComplete = (importedTable: TableDataModel) => {
+    if (confirm("TSVデータをインポートしますか？現在のテーブルは置き換えられます。")) {
+      setTable(importedTable);
+      setSelection(null);
+      setTsvImportModal({ isOpen: false });
+    }
+  };
+
   const canMerge = () => {
     if (!selection) return false;
     const bounds = getSelectionBounds(selection);
@@ -436,17 +435,13 @@ const App = () => {
         onMergeCells={handleMergeCells}
         onSplitCells={handleSplitCells}
         onSmartMerge={handleSmartMerge}
-        onAddRow={handleAddRow}
-        onRemoveRow={handleRemoveRow}
-        onAddColumn={handleAddColumn}
-        onRemoveColumn={handleRemoveColumn}
         onExportSVG={handleExportSVG}
         onPreviewSVG={handlePreviewSVG}
         onNewTable={handleNewTable}
         onClearURL={handleClearURL}
+        onTSVImport={handleTSVImport}
         canMerge={canMerge()}
         canSplit={canSplit()}
-        tableSize={{ rows: table.rows, columns: table.columns }}
         currentGridStyle={table.gridStyle}
       />
       <div style={{ marginTop: "12px" }}>
@@ -460,6 +455,8 @@ const App = () => {
           onRemoveRowAt={handleRemoveRowAt}
           onInsertColumnAt={handleInsertColumnAt}
           onRemoveColumnAt={handleRemoveColumnAt}
+          onAddRow={handleAddRow}
+          onAddColumn={handleAddColumn}
         />
       </div>
       {selection && (
@@ -477,6 +474,8 @@ const App = () => {
         onClose={handlePreviewClose}
         onDownload={handlePreviewDownload}
       />
+
+      <TSVImportModal isOpen={tsvImportModal.isOpen} onClose={handleTSVImportClose} onImport={handleTSVImportComplete} />
     </div>
   );
 };

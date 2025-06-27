@@ -12,6 +12,8 @@ interface TableEditorProps {
   onRemoveRowAt?: (index: number) => void;
   onInsertColumnAt?: (index: number) => void;
   onRemoveColumnAt?: (index: number) => void;
+  onAddRow?: () => void;
+  onAddColumn?: () => void;
 }
 
 interface EditingCell {
@@ -29,6 +31,8 @@ export const TableEditor = ({
   onRemoveRowAt,
   onInsertColumnAt,
   onRemoveColumnAt,
+  onAddRow,
+  onAddColumn,
 }: TableEditorProps) => {
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [editValue, setEditValue] = useState("");
@@ -393,47 +397,118 @@ export const TableEditor = ({
     userSelect: "none" as const,
   };
 
+  const buttonStyle = {
+    padding: "4px 8px",
+    margin: "2px",
+    border: "1px solid #ccc",
+    backgroundColor: "#f8f9fa",
+    cursor: "pointer",
+    borderRadius: "3px",
+    fontSize: "12px",
+    color: "#495057",
+    minWidth: "30px",
+    textAlign: "center" as const,
+  };
+
+  const buttonHoverStyle = {
+    ...buttonStyle,
+    backgroundColor: "#e9ecef",
+    borderColor: "#adb5bd",
+  };
+
   return (
     <div tabIndex={0} onKeyDown={handleKeyDown} style={{ outline: "none", position: "relative" }} role="grid" aria-label="Table editor">
-      <table style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            {/* 左上の空のセル */}
-            <th style={headerStyle}></th>
-            {/* 列番号ヘッダー */}
-            {Array.from({ length: table.columns }, (_, i) => (
-              <th
-                key={`col-${i}`}
-                style={headerStyle}
-                onContextMenu={(e) => {
-                  handleColumnHeaderRightClick(e, i);
-                }}
-                title={`Column ${i + 1} - Right click for options`}
-              >
-                {String.fromCharCode(65 + i)} {/* A, B, C... */}
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
+        <table style={{ borderCollapse: "collapse" }}>
+          <thead>
+            <tr>
+              {/* 左上の空のセル */}
+              <th style={headerStyle}></th>
+              {/* 列番号ヘッダー */}
+              {Array.from({ length: table.columns }, (_, i) => (
+                <th
+                  key={`col-${i}`}
+                  style={headerStyle}
+                  onContextMenu={(e) => {
+                    handleColumnHeaderRightClick(e, i);
+                  }}
+                  title={`Column ${i + 1} - Right click for options`}
+                >
+                  {String.fromCharCode(65 + i)} {/* A, B, C... */}
+                </th>
+              ))}
+              {/* 列追加ボタン */}
+              <th style={{ ...headerStyle, borderLeft: "none" }}>
+                <button
+                  style={buttonStyle}
+                  onClick={() => {
+                    if (onAddColumn) {
+                      onAddColumn();
+                    }
+                  }}
+                  title="Add column"
+                  onMouseEnter={(e) => {
+                    Object.assign(e.currentTarget.style, buttonHoverStyle);
+                  }}
+                  onMouseLeave={(e) => {
+                    Object.assign(e.currentTarget.style, buttonStyle);
+                  }}
+                >
+                  +
+                </button>
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {table.cells.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {/* 行番号ヘッダー */}
-              <th
-                style={headerStyle}
-                onContextMenu={(e) => {
-                  handleRowHeaderRightClick(e, rowIndex);
-                }}
-                title={`Row ${rowIndex + 1} - Right click for options`}
-              >
-                {rowIndex + 1}
-              </th>
-              {/* テーブルセル */}
-              {row.map((cell, colIndex) => renderCell(cell, rowIndex, colIndex))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {table.cells.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {/* 行番号ヘッダー */}
+                <th
+                  style={headerStyle}
+                  onContextMenu={(e) => {
+                    handleRowHeaderRightClick(e, rowIndex);
+                  }}
+                  title={`Row ${rowIndex + 1} - Right click for options`}
+                >
+                  {rowIndex + 1}
+                </th>
+                {/* テーブルセル */}
+                {row.map((cell, colIndex) => renderCell(cell, rowIndex, colIndex))}
+                {/* 列追加ボタン用のプレースホルダー列 */}
+                <td style={{ ...headerStyle, borderLeft: "none", width: "40px" }}></td>
+              </tr>
+            ))}
+            {/* 行追加ボタン行 */}
+            <tr>
+              <th style={headerStyle}>
+                <button
+                  style={buttonStyle}
+                  onClick={() => {
+                    if (onAddRow) {
+                      onAddRow();
+                    }
+                  }}
+                  title="Add row"
+                  onMouseEnter={(e) => {
+                    Object.assign(e.currentTarget.style, buttonHoverStyle);
+                  }}
+                  onMouseLeave={(e) => {
+                    Object.assign(e.currentTarget.style, buttonStyle);
+                  }}
+                >
+                  +
+                </button>
+              </th>
+              {/* 各列に対応する空のセル */}
+              {Array.from({ length: table.columns }, (_, i) => (
+                <td key={`add-row-${i}`} style={{ ...headerStyle, borderLeft: "none" }}></td>
+              ))}
+              {/* 列追加ボタン用のプレースホルダー列 */}
+              <td style={{ ...headerStyle, borderLeft: "none", width: "40px" }}></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* コンテキストメニュー */}
       {contextMenu && (

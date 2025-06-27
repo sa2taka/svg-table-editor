@@ -14,7 +14,7 @@ describe("TableEditor", () => {
       expect(tableElement).toBeInTheDocument();
 
       const rows = screen.getAllByRole("row");
-      expect(rows).toHaveLength(3); // 2 data rows + 1 header row
+      expect(rows).toHaveLength(4); // 2 data rows + 1 header row + 1 add row button row
 
       const cells = screen.getAllByRole("gridcell");
       expect(cells).toHaveLength(6); // 2 rows * 3 columns = 6 gridcells

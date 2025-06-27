@@ -25,7 +25,7 @@ describe("SVG Export in Toolbar", () => {
   it("should render SVG export button", () => {
     const mockOnExportSVG = vi.fn();
 
-    render(<Toolbar onExportSVG={mockOnExportSVG} tableSize={{ rows: 3, columns: 4 }} />);
+    render(<Toolbar onExportSVG={mockOnExportSVG} />);
 
     expect(screen.getByText("📥 Export")).toBeInTheDocument();
   });
@@ -33,7 +33,7 @@ describe("SVG Export in Toolbar", () => {
   it("should have correct button styling", () => {
     const mockOnExportSVG = vi.fn();
 
-    render(<Toolbar onExportSVG={mockOnExportSVG} tableSize={{ rows: 3, columns: 4 }} />);
+    render(<Toolbar onExportSVG={mockOnExportSVG} />);
 
     const exportButton = screen.getByText("📥 Export");
     expect(exportButton).toHaveStyle({
@@ -47,7 +47,7 @@ describe("SVG Export in Toolbar", () => {
     const user = userEvent.setup();
     const mockOnExportSVG = vi.fn();
 
-    render(<Toolbar onExportSVG={mockOnExportSVG} tableSize={{ rows: 3, columns: 4 }} />);
+    render(<Toolbar onExportSVG={mockOnExportSVG} />);
 
     const exportButton = screen.getByText("📥 Export");
     await user.click(exportButton);
@@ -58,7 +58,7 @@ describe("SVG Export in Toolbar", () => {
   it("should show tooltip", () => {
     const mockOnExportSVG = vi.fn();
 
-    render(<Toolbar onExportSVG={mockOnExportSVG} tableSize={{ rows: 3, columns: 4 }} />);
+    render(<Toolbar onExportSVG={mockOnExportSVG} />);
 
     const exportButton = screen.getByText("📥 Export");
     expect(exportButton).toHaveAttribute("title", "Export responsive SVG (auto-sized cells)");

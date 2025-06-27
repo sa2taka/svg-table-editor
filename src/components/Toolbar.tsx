@@ -9,17 +9,13 @@ interface ToolbarProps {
   onMergeCells?: () => void;
   onSplitCells?: () => void;
   onSmartMerge?: () => void;
-  onAddRow?: () => void;
-  onRemoveRow?: () => void;
-  onAddColumn?: () => void;
-  onRemoveColumn?: () => void;
   onExportSVG?: () => void;
   onPreviewSVG?: () => void;
   onNewTable?: () => void;
   onClearURL?: () => void;
+  onTSVImport?: () => void;
   canMerge?: boolean;
   canSplit?: boolean;
-  tableSize?: { rows: number; columns: number };
   currentGridStyle?: {
     innerVertical: string;
     innerHorizontal: string;
@@ -33,17 +29,13 @@ export const Toolbar = ({
   onMergeCells,
   onSplitCells,
   onSmartMerge,
-  onAddRow,
-  onRemoveRow,
-  onAddColumn,
-  onRemoveColumn,
   onExportSVG,
   onPreviewSVG,
   onNewTable,
   onClearURL,
+  onTSVImport,
   canMerge = false,
   canSplit = false,
-  tableSize,
   currentGridStyle,
 }: ToolbarProps) => {
   const handleBoldToggle = () => {
@@ -293,79 +285,6 @@ export const Toolbar = ({
         </button>
       </div>
 
-      {/* Table Size Group */}
-      <div style={groupStyle}>
-        <span style={groupTitleStyle}>
-          Table ({tableSize?.rows ?? 0}×{tableSize?.columns ?? 0})
-        </span>
-        <div style={{ display: "flex", gap: "2px" }}>
-          <button
-            style={{
-              ...buttonStyle,
-              padding: "4px 6px",
-              fontSize: "11px",
-            }}
-            onClick={() => {
-              if (onAddRow) {
-                onAddRow();
-              }
-            }}
-            title="Add row"
-          >
-            +R
-          </button>
-          <button
-            style={{
-              ...buttonStyle,
-              padding: "4px 6px",
-              fontSize: "11px",
-              ...(tableSize?.rows === 1 ? disabledButtonStyle : {}),
-            }}
-            onClick={() => {
-              if (onRemoveRow && tableSize?.rows !== 1) {
-                onRemoveRow();
-              }
-            }}
-            disabled={tableSize?.rows === 1}
-            title="Remove row"
-          >
-            -R
-          </button>
-          <button
-            style={{
-              ...buttonStyle,
-              padding: "4px 6px",
-              fontSize: "11px",
-            }}
-            onClick={() => {
-              if (onAddColumn) {
-                onAddColumn();
-              }
-            }}
-            title="Add column"
-          >
-            +C
-          </button>
-          <button
-            style={{
-              ...buttonStyle,
-              padding: "4px 6px",
-              fontSize: "11px",
-              ...(tableSize?.columns === 1 ? disabledButtonStyle : {}),
-            }}
-            onClick={() => {
-              if (onRemoveColumn && tableSize?.columns !== 1) {
-                onRemoveColumn();
-              }
-            }}
-            disabled={tableSize?.columns === 1}
-            title="Remove column"
-          >
-            -C
-          </button>
-        </div>
-      </div>
-
       {/* Export Group */}
       <div style={groupStyle}>
         <span style={groupTitleStyle}>Export</span>
@@ -431,6 +350,25 @@ export const Toolbar = ({
           title="Create new table (clears current work)"
         >
           🆕 New
+        </button>
+
+        <button
+          style={{
+            ...buttonStyle,
+            backgroundColor: "#28a745",
+            color: "#fff",
+            padding: "4px 8px",
+            fontSize: "11px",
+            border: "1px solid #1e7e34",
+          }}
+          onClick={() => {
+            if (onTSVImport) {
+              onTSVImport();
+            }
+          }}
+          title="Import table from TSV data"
+        >
+          📊 TSV
         </button>
 
         <button
