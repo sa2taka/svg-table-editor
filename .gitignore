@@ -21,5 +21,10 @@ node_modules
 *.sln
 *.sw?
 
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
 sample-svgs/
 .claude/

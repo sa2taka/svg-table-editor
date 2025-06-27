@@ -82,7 +82,7 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["./eslint.config.js", "node_modules/*"],
+    ignores: ["./eslint.config.js", "node_modules/*", "e2e/*", "playwright.config.ts"],
   },
   {
     languageOptions: {
