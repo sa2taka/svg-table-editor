@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { KeyboardShortcutsHelp } from "./components/KeyboardShortcutsHelp.js";
 import { SVGPreviewModal } from "./components/SVGPreviewModal.js";
 import { TableEditor } from "./components/TableEditor.js";
 import { Toolbar } from "./components/Toolbar.js";
@@ -22,6 +23,7 @@ import {
   splitCells,
   TableDataModel,
 } from "./models/TableDataModel.js";
+import { createKeyboardShortcutManager, DEFAULT_SHORTCUTS, KeyboardShortcutManager } from "./utils/keyboardShortcuts.js";
 import { downloadSVG, exportTableToSVG } from "./utils/svgExporter.js";
 import { AppState, clearStateFromURL, getStateFromURL, updateURLWithState } from "./utils/urlStateManager.js";
 
@@ -62,6 +64,15 @@ const App = () => {
   }>({
     isOpen: false,
   });
+
+  const [helpModal, setHelpModal] = useState<{
+    isOpen: boolean;
+  }>({
+    isOpen: false,
+  });
+
+  // キーボードショートカットマネージャー
+  const [shortcutManager] = useState<KeyboardShortcutManager>(() => createKeyboardShortcutManager());
 
   // Debounced URL update to avoid excessive URL changes
   const updateURL = useCallback(() => {
@@ -186,7 +197,7 @@ const App = () => {
     }
   };
 
-  const handleMergeCells = () => {
+  const handleMergeCells = useCallback(() => {
     if (selection) {
       const bounds = getSelectionBounds(selection);
       try {
@@ -195,9 +206,9 @@ const App = () => {
         alert(`Cannot merge cells: ${error instanceof Error ? error.message : "Unknown error"}`);
       }
     }
-  };
+  }, [selection, setTable]);
 
-  const handleSmartMerge = () => {
+  const handleSmartMerge = useCallback(() => {
     if (selection) {
       const bounds = getSelectionBounds(selection);
       try {
@@ -206,30 +217,30 @@ const App = () => {
         alert(`Cannot merge cells: ${error instanceof Error ? error.message : "Unknown error"}`);
       }
     }
-  };
+  }, [selection, setTable]);
 
-  const handleSplitCells = () => {
+  const handleSplitCells = useCallback(() => {
     if (selection) {
       const bounds = getSelectionBounds(selection);
       setTable((prevTable) => splitCells(prevTable, bounds.minRow, bounds.minColumn));
     }
-  };
+  }, [selection, setTable]);
 
-  const handleAddRow = () => {
+  const handleAddRow = useCallback(() => {
     try {
       setTable((prevTable) => addRow(prevTable, prevTable.rows));
     } catch (error) {
       alert(`Cannot add row: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
-  };
+  }, [setTable]);
 
-  const handleAddColumn = () => {
+  const handleAddColumn = useCallback(() => {
     try {
       setTable((prevTable) => addColumn(prevTable, prevTable.columns));
     } catch (error) {
       alert(`Cannot add column: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
-  };
+  }, [setTable]);
 
   // 任意位置での行列操作
   const handleInsertRowAt = (index: number) => {
@@ -304,7 +315,7 @@ const App = () => {
     }
   };
 
-  const handleExportSVG = () => {
+  const handleExportSVG = useCallback(() => {
     try {
       const svgContent = exportTableToSVG(table, {
         cellWidth: 120,
@@ -328,9 +339,9 @@ const App = () => {
     } catch (error) {
       alert(`Cannot export SVG: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
-  };
+  }, [table]);
 
-  const handlePreviewSVG = () => {
+  const handlePreviewSVG = useCallback(() => {
     try {
       const svgContent = exportTableToSVG(table, {
         cellWidth: 120,
@@ -354,7 +365,7 @@ const App = () => {
     } catch (error) {
       alert(`Cannot preview SVG: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
-  };
+  }, [table]);
 
   const handlePreviewClose = () => {
     setPreviewModal({
@@ -371,14 +382,14 @@ const App = () => {
     }
   };
 
-  const handleNewTable = () => {
+  const handleNewTable = useCallback(() => {
     if (confirm("Create a new table? This will clear the current table and URL state.")) {
       const newTable = createInitialTable();
       setTable(newTable);
       setSelection(null);
       clearStateFromURL();
     }
-  };
+  }, []);
 
   const handleClearURL = () => {
     if (confirm("Clear URL state? The table will remain but the URL will be reset.")) {
@@ -402,17 +413,113 @@ const App = () => {
     }
   };
 
-  const canMerge = () => {
+  const canMerge = useCallback(() => {
     if (!selection) return false;
     const bounds = getSelectionBounds(selection);
     return canMergeRange(table, bounds.minRow, bounds.minColumn, bounds.maxRow, bounds.maxColumn);
-  };
+  }, [selection, table]);
 
-  const canSplit = () => {
+  const canSplit = useCallback(() => {
     if (!selection) return false;
     const bounds = getSelectionBounds(selection);
     return canSplitCell(table, bounds.minRow, bounds.minColumn);
-  };
+  }, [selection, table]);
+
+  // キーボードショートカットの初期化
+  useEffect(() => {
+    // ショートカットの登録
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.MERGE_CELLS,
+      action: handleMergeCells,
+      condition: () => canMerge(),
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.SPLIT_CELLS,
+      action: handleSplitCells,
+      condition: () => canSplit(),
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.SMART_MERGE,
+      action: handleSmartMerge,
+      condition: () => selection !== null,
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.ADD_ROW,
+      action: handleAddRow,
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.ADD_COLUMN,
+      action: handleAddColumn,
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.EXPORT_SVG,
+      action: handleExportSVG,
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.PREVIEW_SVG,
+      action: handlePreviewSVG,
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.NEW_TABLE,
+      action: handleNewTable,
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.HELP,
+      action: () => {
+        setHelpModal({ isOpen: true });
+      },
+    });
+
+    shortcutManager.addShortcut({
+      ...DEFAULT_SHORTCUTS.ESC,
+      action: () => {
+        // 開いているモーダルを閉じる
+        if (previewModal.isOpen) {
+          setPreviewModal({ isOpen: false, svgContent: "" });
+        } else if (tsvImportModal.isOpen) {
+          setTsvImportModal({ isOpen: false });
+        } else if (helpModal.isOpen) {
+          setHelpModal({ isOpen: false });
+        }
+      },
+      condition: () => previewModal.isOpen || tsvImportModal.isOpen || helpModal.isOpen,
+    });
+
+    // グローバルキーダウンイベントリスナーを追加
+    const handleKeyDown = (event: KeyboardEvent) => {
+      shortcutManager.handleKeyDown(event);
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    shortcutManager,
+    selection,
+    previewModal.isOpen,
+    tsvImportModal.isOpen,
+    helpModal.isOpen,
+    handleMergeCells,
+    handleSplitCells,
+    handleSmartMerge,
+    handleAddRow,
+    handleAddColumn,
+    handleExportSVG,
+    handlePreviewSVG,
+    handleNewTable,
+    canMerge,
+    canSplit,
+  ]);
 
   const getSelectedCellStyle = (): CellStyle | undefined => {
     if (selection) {
@@ -476,6 +583,14 @@ const App = () => {
       />
 
       <TSVImportModal isOpen={tsvImportModal.isOpen} onClose={handleTSVImportClose} onImport={handleTSVImportComplete} />
+
+      <KeyboardShortcutsHelp
+        isOpen={helpModal.isOpen}
+        onClose={() => {
+          setHelpModal({ isOpen: false });
+        }}
+        shortcuts={shortcutManager.getShortcutList()}
+      />
     </div>
   );
 };
