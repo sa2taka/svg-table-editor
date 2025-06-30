@@ -39,6 +39,7 @@ export const TableEditor = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ row: number; column: number } | null>(null);
   const [isComposing, setIsComposing] = useState(false); // IME変換中フラグ
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     visible: boolean;
     x: number;
@@ -61,6 +62,14 @@ export const TableEditor = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // textareaの高さを自動調整
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [editValue]);
 
   const handleCellClick = (row: number, column: number) => {
     setContextMenu(null); // コンテキストメニューを閉じる
@@ -210,14 +219,22 @@ export const TableEditor = ({
     }
 
     if (e.key === "Enter") {
-      if (editingCell) {
+      if (editingCell && (e.altKey || e.shiftKey)) {
+        // Alt+Enter または Shift+Enter で改行を挿入
+        e.preventDefault();
+        const target = e.target as HTMLTextAreaElement;
+        const start = target.selectionStart;
+        const end = target.selectionEnd;
+        const newValue = editValue.substring(0, start) + "\n" + editValue.substring(end);
+        setEditValue(newValue);
+        // カーソル位置を改行後に設定
+        setTimeout(() => {
+          target.selectionStart = target.selectionEnd = start + 1;
+        }, 0);
+      } else if (editingCell) {
         // 編集中の場合、確定して下のセルに移動
         handleEditConfirm();
-        if (!e.shiftKey) {
-          navigateToCell(editingCell.row, editingCell.column, "down");
-        } else {
-          navigateToCell(editingCell.row, editingCell.column, "up");
-        }
+        navigateToCell(editingCell.row, editingCell.column, "down");
       } else if (selection) {
         // 編集中でない場合、選択されたセルの編集を開始
         const cell = table.cells[selection.startRow][selection.startColumn];
@@ -357,8 +374,8 @@ export const TableEditor = ({
     return (
       <td key={`${rowIndex}-${colIndex}`} {...cellProps}>
         {isEditing ? (
-          <input
-            type="text"
+          <textarea
+            ref={textareaRef}
             value={editValue}
             onChange={(e) => {
               setEditValue(e.target.value);
@@ -376,10 +393,15 @@ export const TableEditor = ({
               background: "transparent",
               fontFamily: "inherit",
               fontSize: "inherit",
+              resize: "none",
+              overflow: "hidden",
+              minHeight: "20px",
+              lineHeight: "1.2",
             }}
+            rows={1}
           />
         ) : (
-          cell.text
+          <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{cell.text}</div>
         )}
       </td>
     );

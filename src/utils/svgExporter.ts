@@ -267,13 +267,25 @@ function renderCell(cell: CellData, opts: Required<SVGExportOptions>, layout: Ta
   // Cell text
   if (cell.text) {
     const textX = getTextX(x, width, cell.style.textAlign, opts.padding);
-    const textY = y + height / 2;
     const fontWeight = cell.style.fontWeight === "bold" ? "bold" : "normal";
     const textColor = cell.style.color;
     const fontFamily = cell.style.fontFamily || opts.fontFamily;
     const textAnchor = getTextAnchor(cell.style.textAlign);
 
-    cellContent += `<text x="${textX}" y="${textY}" class="cell-text" font-weight="${fontWeight}" fill="${textColor}" font-family="${fontFamily}" text-anchor="${textAnchor}">${escapeXml(cell.text)}</text>`;
+    // 改行でテキストを分割
+    const lines = cell.text.split("\n");
+    const lineHeight = opts.fontSize * 1.2;
+    const totalHeight = lines.length * lineHeight;
+    const startY = y + (height - totalHeight) / 2 + opts.fontSize * 0.8;
+
+    cellContent += `<text x="${textX}" y="${startY}" class="cell-text" font-weight="${fontWeight}" fill="${textColor}" font-family="${fontFamily}" text-anchor="${textAnchor}">`;
+
+    lines.forEach((line, index) => {
+      const dy = index === 0 ? 0 : lineHeight;
+      cellContent += `<tspan x="${textX}" dy="${dy}">${escapeXml(line)}</tspan>`;
+    });
+
+    cellContent += `</text>`;
   }
 
   return cellContent;
